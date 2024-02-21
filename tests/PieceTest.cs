@@ -4,21 +4,19 @@ namespace tests;
 
 public class PieceTest
 {
-    [Fact]
-    public void Piece_GetColor_ReturnsCorrectColor()
+    [Theory]
+    [InlineData(Color.white)]
+    [InlineData(Color.black)]
+    public void Piece_GetColor_ReturnsCorrectColor(Color color)
     {
         // Arrange
-        string expectedWhite = "white";
-        string expectedBlack = "black";
+        Color expectedColor = color;
+        Piece piece = new Piece(expectedColor);
 
         // Act
-        Piece piece = new Piece("white");
-        Piece piece2 = new Piece("black");
+        Color actual = piece.GetColor();
 
         // Assert
-        string actual = piece.GetColor();
-        string actual2 = piece2.GetColor();
-        Assert.Equal(expectedWhite, actual);
-        Assert.Equal(expectedBlack, actual2);
+        Assert.Equal(expectedColor, actual);
     }
 }

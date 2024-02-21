@@ -2,15 +2,15 @@ namespace Backgammon;
 
 public class Piece
 {
-    private string color;
+    private Color _color;
 
-    public Piece(string color)
+    public Piece(Color color)
     {
-        this.color = color;
+        this._color = color;
     }
-    public string GetColor()
+    public Color GetColor()
     {
-        return this.color;
+        return this._color;
     }
 }
 
