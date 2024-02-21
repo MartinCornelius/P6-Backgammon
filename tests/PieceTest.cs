@@ -5,7 +5,7 @@ namespace tests;
 public class PieceTest
 {
     [Fact]
-    public void ()
+    public void Piece_GetColor_ReturnsCorrectColor()
     {
         // Arrange
         string expectedWhite = "white";
@@ -14,7 +14,6 @@ public class PieceTest
         // Act
         Piece piece = new Piece("white");
         Piece piece2 = new Piece("black");
-        
 
         // Assert
         string actual = piece.GetColor();
