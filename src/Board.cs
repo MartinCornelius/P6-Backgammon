@@ -53,21 +53,21 @@ public class Board
         }
     }
 
-    public bool UpdatePiecePosition(int piecePosition, int roll, Player currentPlayer)
+    public bool MovePiece(int piecePosition, int roll, Player currentPlayer)
     {
-        int dir = currentPlayer.Color == Color.white?-1:1;
-        int targetPosition = piecePosition+roll*dir;
+        int dir = currentPlayer.Color == Color.white ? -1 : 1;
+        int targetPosition = piecePosition + roll * dir;
 
         bool isInsideBoard = IsInsideBoard(targetPosition, currentPlayer);
         TileAvailability availableTile = CheckedDst(targetPosition, currentPlayer);
 
-        if(availableTile == TileAvailability.blocked)
+        if (availableTile == TileAvailability.blocked)
             return false;
-        if(isInsideBoard == false)
+        if (isInsideBoard == false)
             return false;
         //if(availableTile == TileAvailability.onePiece)
-            //HitHome(targetposition, currentPlayer)
-        PieceMove(piecePosition, targetPosition, currentPlayer);
+        //HitHome(targetposition, currentPlayer)
+        changePiecePositions(piecePosition, targetPosition, currentPlayer);
         return true;
     }
 
@@ -75,27 +75,84 @@ public class Board
     {
         return true;
     }
-    
+
     private TileAvailability CheckedDst(int targetPosition, Player currentPlayer)
     {
 
         List<Piece> destination = this.state[targetPosition];
 
-        if(destination.Count == 0)
+        if (destination.Count == 0)
             return TileAvailability.free;
-        else if(destination.Count == 1 && destination[0].GetColor() != currentPlayer.Color)
+        else if (destination.Count == 1 && destination[0].GetColor() != currentPlayer.Color)
             return TileAvailability.onePiece;
-        else if(destination.Count > 1 && destination[0].GetColor() != currentPlayer.Color)
+        else if (destination.Count > 1 && destination[0].GetColor() != currentPlayer.Color)
             return TileAvailability.blocked;
         else
             return TileAvailability.free;
     }
-    private void PieceMove(int piecePosition, int targetPosition, Player currentPlayer)
+    private void changePiecePositions(int piecePosition, int targetPosition, Player currentPlayer)
     {
         this.state[piecePosition].RemoveAt(0);
         this.state[targetPosition].Add(new Piece(currentPlayer.Color));
     }
-        
 
-    // public bool IsAllHome()
+    public void Print()
+    {
+        Console.WriteLine(" 13 14 15 16 17 18  19 20 21 22 23 24");
+        Console.WriteLine("+--+--+--+--+--+--++--+--+--+--+--+--+--+");
+        int maxPieces = state.Max(tile => tile.Count);
+
+        // Printing upper part
+        for (int row = 0; row < maxPieces; row++)
+        {
+            for (int tile = 13; tile <= 25; tile++)
+            {
+                if (tile == 19)
+                    Console.Write("||");
+                else
+                    Console.Write("|");
+
+                List<Piece> pieces = state[tile];
+                if (pieces.Count > row)
+                {
+                    Console.Write(pieces[row].GetColor() == Color.black ? "B" : "W");
+                }
+                else
+                {
+                    Console.Write(" ");
+                }
+                Console.Write(" ");
+            }
+            Console.WriteLine("|");
+        }
+        Console.WriteLine("+--+--+--+--+--+--++--+--+--+--+--+--+--+");
+
+        // Printing lower part
+        Console.WriteLine("+--+--+--+--+--+--++--+--+--+--+--+--+--+");
+        for (int row = maxPieces - 1; row >= 0; row--)
+        {
+            for (int tile = 12; tile >= 0; tile--)
+            {
+                if (tile == 6)
+                    Console.Write("||");
+                else
+                    Console.Write("|");
+
+                List<Piece> pieces = state[tile];
+                if (pieces.Count > row)
+                {
+                    Console.Write(pieces[row].GetColor() == Color.black ? "B" : "W");
+                }
+                else
+                {
+                    Console.Write(" ");
+                }
+                Console.Write(" ");
+            }
+            Console.WriteLine("|");
+        }
+        Console.WriteLine("+--+--+--+--+--+--++--+--+--+--+--+--+--+");
+        Console.WriteLine(" 12 11 10 9  8  7    6  5  4  3  2  1");
+    }
+
 }
