@@ -11,6 +11,7 @@ public class Program
         Player player2 = new Player("Player2", Color.white);
 
         // Create new game
-        Game game = new Game(player1, player2);
+        //Game game = new Game(player1, player2);
+        Gui g = new Gui();
     }
 }

@@ -2,11 +2,11 @@ namespace Backgammon;
 
 public class Game
 {
-    private Board board;
-    private Player currentPlayer;
+    public Board board;
+    public Player currentPlayer;
     private Player player1;
     private Player player2;
-    private DicePair dice;
+    public DicePair dice;
 
     public Game(Player p1, Player p2)
     {
