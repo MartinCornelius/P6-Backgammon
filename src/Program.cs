@@ -6,14 +6,11 @@ public class Program
     {
         Console.Clear();
 
-        Player player1 = new Player("Martim", Color.black);
-        Player player2 = new Player("Martin", Color.white);
+        // Handle new players
+        Player player1 = new Player("Player1", Color.black);
+        Player player2 = new Player("Player2", Color.white);
 
-        Board board = new Board();
-        board.InitBoard();
-        board.Print();
-
-        board.MovePiece(1, 4, player1);
-        board.Print();
+        // Create new game
+        Game game = new Game(player1, player2);
     }
 }

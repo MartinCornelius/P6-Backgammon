@@ -3,13 +3,13 @@ namespace Backgammon;
 public class Dice
 {
     private Random random;
-    public int value { get; set; }
+    public int Value { get; set; }
     public Dice()
     {
         this.random = new Random();
     }
     public void Roll()
     {
-        this.value = this.random.Next(1, 7);
+        this.Value = this.random.Next(1, 7);
     }
 }

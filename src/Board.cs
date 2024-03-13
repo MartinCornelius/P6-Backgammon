@@ -12,6 +12,7 @@ public class Board
         {
             this.state[i] = new List<Piece>();
         }
+        this.InitBoard();
     }
 
     public List<Piece>[] GetBoardState()
@@ -90,6 +91,7 @@ public class Board
         else
             return TileAvailability.free;
     }
+
     private void changePiecePositions(int piecePosition, int targetPosition, Player currentPlayer)
     {
         this.state[piecePosition].RemoveAt(0);
@@ -155,4 +157,8 @@ public class Board
         Console.WriteLine(" 12 11 10 9  8  7    6  5  4  3  2  1");
     }
 
+    public bool HasWon()
+    {
+        return false;
+    }
 }
