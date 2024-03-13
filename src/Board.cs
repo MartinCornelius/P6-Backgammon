@@ -60,20 +60,72 @@ public class Board
         int targetPosition = piecePosition + roll * dir;
 
         bool isInsideBoard = IsInsideBoard(targetPosition, currentPlayer);
+        bool correctPieceAtPosition = CorrectPieceAtPosition(piecePosition, currentPlayer);
+
+        if (isInsideBoard == false || correctPieceAtPosition == false)
+            return false;
+
         TileAvailability availableTile = CheckedDst(targetPosition, currentPlayer);
 
         if (availableTile == TileAvailability.blocked)
-            return false;
-        if (isInsideBoard == false)
             return false;
         //if(availableTile == TileAvailability.onePiece)
         //HitHome(targetposition, currentPlayer)
         changePiecePositions(piecePosition, targetPosition, currentPlayer);
         return true;
     }
-
-    private bool IsInsideBoard(int targetPosition, Player currentPlayer)
+    // Should change the current players IsAllHome value so it can be used to schmove later
+    private void allAreHome(Player currentPlayer)
     {
+        if(currentPlayer.Color == Color.black)
+        {
+            currentPlayer.IsAllHome = true;
+        }
+    }
+
+    // Checks if there are pieces at the target position and if the piece is the correct color
+    private bool CorrectPieceAtPosition(int piecePosition, Player currentPlayer)
+    {   
+        
+        if(piecePosition <= 0 || piecePosition >= 25)
+        {
+            Console.WriteLine("Target piece is outside of the board");
+            return false;
+        }
+        else if(this.state[piecePosition].Count  == 0){
+            Console.WriteLine("No pieces at position: ", piecePosition);
+            return false;
+        }
+        else if(this.state[piecePosition][0].GetColor() != currentPlayer.Color){
+            Console.WriteLine("Wrong piece color");
+            return false;
+        }
+           
+
+        return true;
+    }
+
+    // Checks if the piece to move will be moved out of the board
+    private bool IsInsideBoard(int targetPosition, Player currentPlayer)
+    {   
+        int lower = 1;
+        int higher = 24;
+        if(currentPlayer.IsAllHome)
+        {
+            lower = 0;
+            higher = 25;
+        }
+        if(currentPlayer.Color == Color.white && targetPosition < lower)
+        {   
+            Console.WriteLine("All pieces are not home yet");
+            return false;
+        }else if(currentPlayer.Color == Color.black && targetPosition > higher)
+        {  
+            Console.WriteLine("All pieces are not home yet");
+            return false;
+        }
+        
+        
         return true;
     }
 
