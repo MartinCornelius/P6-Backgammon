@@ -17,7 +17,8 @@ public class Gui
     public Gui()
     {
         this.board = new Board();
-        this.board.InitBoard();
+        this.board.Print();
+
         this.Run();
     }
 
@@ -67,11 +68,22 @@ public class Gui
     {
         List<Piece>[] state = board.GetBoardState();
         int counter = 0;
+        Raylib_cs.Color currentColor;
         for (int j = 0; j < state.Length / 2; j++)
         {
             for (int i = 0; i < state[j].Count; i++)
             {
-                Raylib.DrawCircle(j * tileWidth + (tileWidth / 2), (pieceRadius * 2) * i + pieceRadius, pieceRadius, Raylib_cs.Color.Beige);
+                currentColor = state[j].First().GetColor() == Color.white ? Raylib_cs.Color.White : Raylib_cs.Color.Black;
+                Raylib.DrawCircle(j * tileWidth - (tileWidth / 2), pieceRadius * 2 * i + pieceRadius, pieceRadius, currentColor);
+                counter++;
+            }
+        }
+        for (int j = 13; j < state.Length; j++)
+        {
+            for (int i = 0; i < state[j].Count; i++)
+            {
+                currentColor = state[j].First().GetColor() == Color.white ? Raylib_cs.Color.White : Raylib_cs.Color.Black;
+                Raylib.DrawCircle((j - 12) * tileWidth - (tileWidth / 2), 2 * tileHeight - i * pieceRadius * 2, pieceRadius, currentColor);
                 counter++;
             }
         }
