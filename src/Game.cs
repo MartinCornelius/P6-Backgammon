@@ -5,6 +5,7 @@ public class Game
     private Board board;
     private Player currentPlayer;
     private Player player1;
+    private Player enemyPlayer;
     private Player player2;
     private DicePair dice;
 
@@ -16,6 +17,7 @@ public class Game
         this.player2 = p2;
 
         this.currentPlayer = player1;
+        this.enemyPlayer = player2;
         this.dice = new DicePair();
 
         this.board = new Board();
@@ -60,7 +62,7 @@ public class Game
 
             Console.WriteLine("\nPlease pick a piece to move:");
             positionToMove = Int32.Parse(Console.ReadLine()!);
-        } while (!board.MovePiece(positionToMove, currentDice, this.currentPlayer));
+        } while (!board.MovePiece(positionToMove, currentDice, this.currentPlayer, this.enemyPlayer));
         this.board.Print();
 
         currentDice = currentDice == d1 ? d2 : d1;
@@ -69,7 +71,7 @@ public class Game
             // Change currentDice
             Console.WriteLine("\nPlease pick a piece to move " + currentDice + " moves:");
             positionToMove = Int32.Parse(Console.ReadLine()!);
-        } while (!board.MovePiece(positionToMove, currentDice, this.currentPlayer));
+        } while (!board.MovePiece(positionToMove, currentDice, this.currentPlayer, this.enemyPlayer));
         this.board.Print();
     }
 }

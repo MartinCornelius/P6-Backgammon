@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks.Sources;
 
 namespace Backgammon;
 
@@ -54,10 +55,12 @@ public class Board
         }
     }
 
-    public bool MovePiece(int piecePosition, int roll, Player currentPlayer)
+    public bool MovePiece(int piecePosition, int roll, Player currentPlayer, Player enemyPlayer)
     {
         int dir = currentPlayer.Color == Color.white ? -1 : 1;
         int targetPosition = piecePosition + roll * dir;
+        
+        allAreHome(currentPlayer);
 
         bool isInsideBoard = IsInsideBoard(targetPosition, currentPlayer);
         bool correctPieceAtPosition = CorrectPieceAtPosition(piecePosition, currentPlayer);
@@ -69,18 +72,46 @@ public class Board
 
         if (availableTile == TileAvailability.blocked)
             return false;
-        //if(availableTile == TileAvailability.onePiece)
+        if(availableTile == TileAvailability.onePiece)
+            RemovePieceAtPosition(targetPosition, enemyPlayer);
         //HitHome(targetposition, currentPlayer)
+
+        
+
+        if(currentPlayer.IsAllHome)
+            Console.WriteLine("All pieces are home");
+        else
+            Console.WriteLine("not yet");
+
         changePiecePositions(piecePosition, targetPosition, currentPlayer);
         return true;
     }
-    // Should change the current players IsAllHome value so it can be used to schmove later
+
     private void allAreHome(Player currentPlayer)
     {
+        bool allAreHome = true;
+
         if(currentPlayer.Color == Color.black)
         {
-            currentPlayer.IsAllHome = true;
+            for (int i = 1; i < state.Length-7; i++)
+            {
+                if(state[i].Count > 0 && state[i][0].GetColor() == currentPlayer.Color)
+                {
+                    allAreHome = false;
+                }
+            }
+        }else if(currentPlayer.Color == Color.white)
+        {
+            Console.WriteLine("hello");
+            for (int i = 24; i > 6; i--)
+            {
+                if(state[i].Count > 0 && state[i][0].GetColor() == currentPlayer.Color)
+                {
+                    allAreHome = false;
+                }
+            }
         }
+        currentPlayer.IsAllHome = allAreHome;
     }
 
     // Checks if there are pieces at the target position and if the piece is the correct color
@@ -121,6 +152,7 @@ public class Board
             return false;
         }else if(currentPlayer.Color == Color.black && targetPosition > higher)
         {  
+            Console.WriteLine(currentPlayer.IsAllHome);
             Console.WriteLine("All pieces are not home yet");
             return false;
         }
@@ -142,6 +174,12 @@ public class Board
             return TileAvailability.blocked;
         else
             return TileAvailability.free;
+    }
+
+    private void RemovePieceAtPosition(int targetPosition, Player enemyPlayer)
+    {
+        enemyPlayer.amountOutOfPlay += 1;
+        this.state[targetPosition].RemoveAt(0);
     }
 
     private void changePiecePositions(int piecePosition, int targetPosition, Player currentPlayer)
