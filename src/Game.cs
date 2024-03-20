@@ -39,6 +39,8 @@ public class Game
         Console.WriteLine("[ROLLING] rolling the dice...");
         this.dice.Roll();
 
+
+
         // Values of the dice
         // TODO: check for double dice
         (int d1, int d2) = this.dice.GetDiceValues();
@@ -47,18 +49,22 @@ public class Game
         int positionToMove = -1;
         do
         {
+            bool running = true;
+            do{
             Console.WriteLine("You have rolled: (1)" + d1 + " and (2)" + d2);
             Console.WriteLine("Please pick a dice (1) or (2):");
-
             switch (Console.ReadKey().Key)
             {
                 case ConsoleKey.D1:
                     currentDice = d1;
+                    running = false;
                     break;
                 case ConsoleKey.D2: // 2 on the keyboard
                     currentDice = d2;
+                    running = false;
                     break;
             }
+            }while(running);
 
             Console.WriteLine("\nPlease pick a piece to move:");
             positionToMove = Int32.Parse(Console.ReadLine()!);

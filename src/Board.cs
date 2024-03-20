@@ -62,7 +62,6 @@ public class Board
         
         allAreHome(currentPlayer);
 
-
         if (currentPlayer.IsAllHome && areAllHigherValuePiecesUnavailible(currentPlayer, piecePosition, targetPosition)){
             if(currentPlayer.LargestPiece == piecePosition && currentPlayer.Color == Color.black && roll + piecePosition > 24){
                 Console.WriteLine("hello worldnt");
@@ -92,6 +91,7 @@ public class Board
         changePiecePositions(piecePosition, targetPosition, currentPlayer);
         return true;
     }
+
 
     private void allAreHome(Player currentPlayer)
     {
@@ -175,7 +175,6 @@ public class Board
             for (int i = 24; i >= 19; i--)
             {   
                 lastPositionPieces += state[i].Count();
-                // skal ændres til 15
                 if(lastPositionPieces == 15)
                 {   
                     largest = i;
@@ -193,7 +192,6 @@ public class Board
             for (int i = 1; i <= 6; i++)
             {   
                 lastPositionPieces += state[i].Count();
-                // skal ændres til 15
                 if(lastPositionPieces == 15)
                 {   
                     largest = i;
@@ -300,6 +298,9 @@ public class Board
 
     public bool HasWon()
     {
+        if(state[25].Count() == 15 || state[0].Count() == 15)
+            return true;
+
         return false;
     }
 }
