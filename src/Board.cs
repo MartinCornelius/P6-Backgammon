@@ -62,10 +62,23 @@ public class Board
         
         allAreHome(currentPlayer);
 
-        bool isInsideBoard = IsInsideBoard(targetPosition, currentPlayer);
+
+        if (currentPlayer.IsAllHome && areAllHigherValuePiecesUnavailible(currentPlayer, piecePosition, targetPosition)){
+            if(currentPlayer.LargestPiece == piecePosition && currentPlayer.Color == Color.black && roll + piecePosition > 24){
+                Console.WriteLine("hello worldnt");
+                targetPosition = 25;
+            }else if(currentPlayer.LargestPiece == piecePosition && currentPlayer.Color == Color.white && piecePosition - roll < 0){
+                Console.WriteLine("hello world");
+                targetPosition = 0;
+            }
+            Console.WriteLine(currentPlayer.Color);
+            Console.WriteLine("cakcckacka");
+        }
+
+        bool isInsideBoard = IsInsideBoard(piecePosition, targetPosition, currentPlayer);
         bool correctPieceAtPosition = CorrectPieceAtPosition(piecePosition, currentPlayer);
 
-        if (isInsideBoard == false || correctPieceAtPosition == false)
+        if ((isInsideBoard == false || correctPieceAtPosition == false))
             return false;
 
         TileAvailability availableTile = CheckedDst(targetPosition, currentPlayer);
@@ -75,13 +88,6 @@ public class Board
         if(availableTile == TileAvailability.onePiece)
             RemovePieceAtPosition(targetPosition, enemyPlayer);
         //HitHome(targetposition, currentPlayer)
-
-        
-
-        if(currentPlayer.IsAllHome)
-            Console.WriteLine("All pieces are home");
-        else
-            Console.WriteLine("not yet");
 
         changePiecePositions(piecePosition, targetPosition, currentPlayer);
         return true;
@@ -102,7 +108,6 @@ public class Board
             }
         }else if(currentPlayer.Color == Color.white)
         {
-            Console.WriteLine("hello");
             for (int i = 24; i > 6; i--)
             {
                 if(state[i].Count > 0 && state[i][0].GetColor() == currentPlayer.Color)
@@ -137,7 +142,7 @@ public class Board
     }
 
     // Checks if the piece to move will be moved out of the board
-    private bool IsInsideBoard(int targetPosition, Player currentPlayer)
+    private bool IsInsideBoard(int piecePostion, int targetPosition, Player currentPlayer)
     {   
         int lower = 1;
         int higher = 24;
@@ -148,17 +153,59 @@ public class Board
         }
         if(currentPlayer.Color == Color.white && targetPosition < lower)
         {   
-            Console.WriteLine("All pieces are not home yet");
+            Console.WriteLine("All pieces are not home yet");    
             return false;
+            
         }else if(currentPlayer.Color == Color.black && targetPosition > higher)
         {  
-            Console.WriteLine(currentPlayer.IsAllHome);
             Console.WriteLine("All pieces are not home yet");
             return false;
         }
-        
-        
         return true;
+    }
+
+    // Checks if there are only pieces that are closer to their home than the dice values.
+    private bool areAllHigherValuePiecesUnavailible(Player currentPlayer, int piecePosition, int targetPosition)
+    {
+        if(currentPlayer.Color == Color.black)
+        {
+            int lastPositionPieces;
+            int largest = 19;
+            lastPositionPieces = state[25].Count();
+            for (int i = 24; i >= 19; i--)
+            {   
+                lastPositionPieces += state[i].Count();
+                // skal ændres til 15
+                if(lastPositionPieces == 15)
+                {   
+                    largest = i;
+                    i = 1;
+                }
+            }
+            currentPlayer.LargestPiece = largest;
+            if(targetPosition > largest){
+                return true;
+            }
+        }else{
+            int lastPositionPieces;
+            int largest = 6;
+            lastPositionPieces = state[0].Count();
+            for (int i = 1; i <= 6; i++)
+            {   
+                lastPositionPieces += state[i].Count();
+                // skal ændres til 15
+                if(lastPositionPieces == 15)
+                {   
+                    largest = i;
+                    i = 69;
+                }
+            }
+            currentPlayer.LargestPiece = largest;
+            if(targetPosition < largest){
+                return true;
+            }
+        }
+        return false;
     }
 
     private TileAvailability CheckedDst(int targetPosition, Player currentPlayer)
@@ -184,6 +231,10 @@ public class Board
 
     private void changePiecePositions(int piecePosition, int targetPosition, Player currentPlayer)
     {
+        if(piecePosition == currentPlayer.LargestPiece){
+            Console.WriteLine("asdfasf");
+        }
+
         this.state[piecePosition].RemoveAt(0);
         this.state[targetPosition].Add(new Piece(currentPlayer.Color));
     }
