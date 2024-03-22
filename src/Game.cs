@@ -47,37 +47,42 @@ public class Game
 
         int currentDice = -1;
         int positionToMove = -1;
-        do
-        {
-            bool running = true;
-            do{
-            Console.WriteLine("You have rolled: (1)" + d1 + " and (2)" + d2);
-            Console.WriteLine("Please pick a dice (1) or (2):");
-            switch (Console.ReadKey().Key)
+        Console.WriteLine("You have rolled: (1)" + d1 + " and (2)" + d2);
+        if(board.moveExists(d1, d2, currentPlayer)){
+            do
             {
-                case ConsoleKey.D1:
-                    currentDice = d1;
-                    running = false;
-                    break;
-                case ConsoleKey.D2: // 2 on the keyboard
-                    currentDice = d2;
-                    running = false;
-                    break;
-            }
-            }while(running);
+                bool running = true;
+                do{
+                Console.WriteLine("Please pick a dice (1) or (2):");
+                switch (Console.ReadKey().Key)
+                {
+                    case ConsoleKey.D1:
+                        currentDice = d1;
+                        running = false;
+                        break;
+                    case ConsoleKey.D2: // 2 on the keyboard
+                        currentDice = d2;
+                        running = false;
+                        break;
+                }
+                }while(running);
 
-            Console.WriteLine("\nPlease pick a piece to move:");
-            positionToMove = Int32.Parse(Console.ReadLine()!);
-        } while (!board.MovePiece(positionToMove, currentDice, this.currentPlayer, this.enemyPlayer));
-        this.board.Print();
+                Console.WriteLine("\nPlease pick a piece to move:");
+                positionToMove = Int32.Parse(Console.ReadLine()!);
+            } while (!board.MovePiece(positionToMove, currentDice, this.currentPlayer, this.enemyPlayer));
+            this.board.Print();
 
-        currentDice = currentDice == d1 ? d2 : d1;
-        do
-        {
-            // Change currentDice
-            Console.WriteLine("\nPlease pick a piece to move " + currentDice + " moves:");
-            positionToMove = Int32.Parse(Console.ReadLine()!);
-        } while (!board.MovePiece(positionToMove, currentDice, this.currentPlayer, this.enemyPlayer));
-        this.board.Print();
+            currentDice = currentDice == d1 ? d2 : d1;
+            do
+            {
+                // Change currentDice
+                Console.WriteLine("\nPlease pick a piece to move " + currentDice + " moves:");
+                positionToMove = Int32.Parse(Console.ReadLine()!);
+            } while (!board.MovePiece(positionToMove, currentDice, this.currentPlayer, this.enemyPlayer));
+            this.board.Print();
+        }
+        else{
+            Console.Write("no move availible");
+        }
     }
 }

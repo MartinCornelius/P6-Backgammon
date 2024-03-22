@@ -64,14 +64,10 @@ public class Board
 
         if (currentPlayer.IsAllHome && areAllHigherValuePiecesUnavailible(currentPlayer, piecePosition, targetPosition)){
             if(currentPlayer.LargestPiece == piecePosition && currentPlayer.Color == Color.black && roll + piecePosition > 24){
-                Console.WriteLine("hello worldnt");
                 targetPosition = 25;
             }else if(currentPlayer.LargestPiece == piecePosition && currentPlayer.Color == Color.white && piecePosition - roll < 0){
-                Console.WriteLine("hello world");
                 targetPosition = 0;
             }
-            Console.WriteLine(currentPlayer.Color);
-            Console.WriteLine("cakcckacka");
         }
 
         bool isInsideBoard = IsInsideBoard(piecePosition, targetPosition, currentPlayer);
@@ -90,6 +86,27 @@ public class Board
 
         changePiecePositions(piecePosition, targetPosition, currentPlayer);
         return true;
+    }
+
+    public bool moveExists(int d1, int d2, Player currentPlayer)
+    {
+        int target1;
+        int target2;
+        for (int i = 1; i < 24; i++)
+        {
+            if(state[i].Count > 0 && state[i][0].GetColor() == currentPlayer.Color)
+            {
+                target1 = i + d1;
+                target2 = i + d2;
+                TileAvailability availableTile1 = CheckedDst(target1, currentPlayer);
+                TileAvailability availableTile2 = CheckedDst(target2, currentPlayer);
+                if((IsInsideBoard(i, target1, currentPlayer) || IsInsideBoard(i, target2, currentPlayer)) && availableTile1 != TileAvailability.blocked && availableTile2 != TileAvailability.blocked)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
