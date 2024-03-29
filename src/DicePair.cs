@@ -17,9 +17,14 @@ public class DicePair
 
     public Boolean IsDoubleDice()
     {
-        if (this.d1.value == this.d2.value)
+        if (this.d1.Value == this.d2.Value)
             return true;
 
         return false;
+    }
+
+    public (int d1, int d2) GetDiceValues()
+    {
+        return (this.d1.Value, this.d2.Value);
     }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks.Sources;
 
 namespace Backgammon;
 
@@ -12,6 +13,7 @@ public class Board
         {
             this.state[i] = new List<Piece>();
         }
+        this.InitBoard();
     }
 
     public List<Piece>[] GetBoardState()
@@ -53,27 +55,172 @@ public class Board
         }
     }
 
-    public bool MovePiece(int piecePosition, int roll, Player currentPlayer)
+    public bool MovePiece(int piecePosition, int roll, Player currentPlayer, Player enemyPlayer)
     {
         int dir = currentPlayer.Color == Color.white ? -1 : 1;
         int targetPosition = piecePosition + roll * dir;
+        
+        allAreHome(currentPlayer);
 
-        bool isInsideBoard = IsInsideBoard(targetPosition, currentPlayer);
+        if (currentPlayer.IsAllHome && areAllHigherValuePiecesUnavailible(currentPlayer, piecePosition, targetPosition)){
+            if(currentPlayer.LargestPiece == piecePosition && currentPlayer.Color == Color.black && roll + piecePosition > 24){
+                targetPosition = 25;
+            }else if(currentPlayer.LargestPiece == piecePosition && currentPlayer.Color == Color.white && piecePosition - roll < 0){
+                targetPosition = 0;
+            }
+        }
+
+        bool isInsideBoard = IsInsideBoard(piecePosition, targetPosition, currentPlayer);
+        bool correctPieceAtPosition = CorrectPieceAtPosition(piecePosition, currentPlayer);
+
+        if ((isInsideBoard == false || correctPieceAtPosition == false))
+            return false;
+
         TileAvailability availableTile = CheckedDst(targetPosition, currentPlayer);
 
         if (availableTile == TileAvailability.blocked)
             return false;
-        if (isInsideBoard == false)
-            return false;
-        //if(availableTile == TileAvailability.onePiece)
+        if(availableTile == TileAvailability.onePiece)
+            RemovePieceAtPosition(targetPosition, enemyPlayer);
         //HitHome(targetposition, currentPlayer)
+
         changePiecePositions(piecePosition, targetPosition, currentPlayer);
         return true;
     }
 
-    private bool IsInsideBoard(int targetPosition, Player currentPlayer)
+    public bool moveExists(int d1, int d2, Player currentPlayer)
     {
+        int target1;
+        int target2;
+        for (int i = 1; i < 24; i++)
+        {
+            if(state[i].Count > 0 && state[i][0].GetColor() == currentPlayer.Color)
+            {
+                target1 = i + d1;
+                target2 = i + d2;
+                TileAvailability availableTile1 = CheckedDst(target1, currentPlayer);
+                TileAvailability availableTile2 = CheckedDst(target2, currentPlayer);
+                if((IsInsideBoard(i, target1, currentPlayer) || IsInsideBoard(i, target2, currentPlayer)) && availableTile1 != TileAvailability.blocked && availableTile2 != TileAvailability.blocked)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
+    private void allAreHome(Player currentPlayer)
+    {
+        bool allAreHome = true;
+
+        if(currentPlayer.Color == Color.black)
+        {
+            for (int i = 1; i < state.Length-7; i++)
+            {
+                if(state[i].Count > 0 && state[i][0].GetColor() == currentPlayer.Color)
+                {
+                    allAreHome = false;
+                }
+            }
+        }else if(currentPlayer.Color == Color.white)
+        {
+            for (int i = 24; i > 6; i--)
+            {
+                if(state[i].Count > 0 && state[i][0].GetColor() == currentPlayer.Color)
+                {
+                    allAreHome = false;
+                }
+            }
+        }
+        currentPlayer.IsAllHome = allAreHome;
+    }
+
+    // Checks if there are pieces at the target position and if the piece is the correct color
+    private bool CorrectPieceAtPosition(int piecePosition, Player currentPlayer)
+    {   
+        
+        if(piecePosition <= 0 || piecePosition >= 25)
+        {
+            Console.WriteLine("Target piece is outside of the board");
+            return false;
+        }
+        else if(this.state[piecePosition].Count  == 0){
+            Console.WriteLine("No pieces at position: ", piecePosition);
+            return false;
+        }
+        else if(this.state[piecePosition][0].GetColor() != currentPlayer.Color){
+            Console.WriteLine("Wrong piece color");
+            return false;
+        }
+           
+
         return true;
+    }
+
+    // Checks if the piece to move will be moved out of the board
+    private bool IsInsideBoard(int piecePostion, int targetPosition, Player currentPlayer)
+    {   
+        int lower = 1;
+        int higher = 24;
+        if(currentPlayer.IsAllHome)
+        {
+            lower = 0;
+            higher = 25;
+        }
+        if(currentPlayer.Color == Color.white && targetPosition < lower)
+        {   
+            Console.WriteLine("All pieces are not home yet");    
+            return false;
+            
+        }else if(currentPlayer.Color == Color.black && targetPosition > higher)
+        {  
+            Console.WriteLine("All pieces are not home yet");
+            return false;
+        }
+        return true;
+    }
+
+    // Checks if there are only pieces that are closer to their home than the dice values.
+    private bool areAllHigherValuePiecesUnavailible(Player currentPlayer, int piecePosition, int targetPosition)
+    {
+        if(currentPlayer.Color == Color.black)
+        {
+            int lastPositionPieces;
+            int largest = 19;
+            lastPositionPieces = state[25].Count();
+            for (int i = 24; i >= 19; i--)
+            {   
+                lastPositionPieces += state[i].Count();
+                if(lastPositionPieces == 15)
+                {   
+                    largest = i;
+                    i = 1;
+                }
+            }
+            currentPlayer.LargestPiece = largest;
+            if(targetPosition > largest){
+                return true;
+            }
+        }else{
+            int lastPositionPieces;
+            int largest = 6;
+            lastPositionPieces = state[0].Count();
+            for (int i = 1; i <= 6; i++)
+            {   
+                lastPositionPieces += state[i].Count();
+                if(lastPositionPieces == 15)
+                {   
+                    largest = i;
+                    i = 69;
+                }
+            }
+            currentPlayer.LargestPiece = largest;
+            if(targetPosition < largest){
+                return true;
+            }
+        }
+        return false;
     }
 
     private TileAvailability CheckedDst(int targetPosition, Player currentPlayer)
@@ -90,8 +237,19 @@ public class Board
         else
             return TileAvailability.free;
     }
+
+    private void RemovePieceAtPosition(int targetPosition, Player enemyPlayer)
+    {
+        enemyPlayer.amountOutOfPlay += 1;
+        this.state[targetPosition].RemoveAt(0);
+    }
+
     private void changePiecePositions(int piecePosition, int targetPosition, Player currentPlayer)
     {
+        if(piecePosition == currentPlayer.LargestPiece){
+            Console.WriteLine("asdfasf");
+        }
+
         this.state[piecePosition].RemoveAt(0);
         this.state[targetPosition].Add(new Piece(currentPlayer.Color));
     }
@@ -155,4 +313,11 @@ public class Board
         Console.WriteLine(" 12 11 10 9  8  7    6  5  4  3  2  1");
     }
 
+    public bool HasWon()
+    {
+        if(state[25].Count() == 15 || state[0].Count() == 15)
+            return true;
+
+        return false;
+    }
 }
