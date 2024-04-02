@@ -89,7 +89,6 @@ class Board:
         legal_moves = []
         for src in range(24):
             for dst in range(24):
-                print(src, dst)
                 if self.is_legal_move(player, src, dst, dice):
                     legal_moves.append((src, dst))
 
