@@ -24,13 +24,17 @@ class Board:
         return random.randint(1, 6), random.randint(1, 6)
 
     def move_piece(self, player, src, dst):
+        if self.points[player][src] <= 0: return
         """Move a piece from source to destination point"""
-        self.points[player][src] -= 1
-        self.points[player][dst] += 1
-
-        if (player == 0 and dst < 0) or (player == 1 and dst >= 24):
-            print("bearing off piece")
-            self.bear_off_piece(player, src)
+        if (player == 0 and dst < 0):
+            if sum(self.points[player][:6]) == 15 - self.borne_off[player]:
+                self.bear_off_piece(player, src)
+        elif (player == 1 and dst >= 24):
+            if sum(self.points[player][18:]) == 15 - self.borne_off[player]:
+                self.bear_off_piece(player, src)
+        else:
+            self.points[player][src] -= 1
+            self.points[player][dst] += 1
 
     def hit_piece(self, player, pos):
         """Hit a piece and place it on the bar"""
@@ -48,19 +52,19 @@ class Board:
         self.borne_off[player] += 1
     
     def is_legal_move(self, player, src, dst, dice):
+        for p in self.points[player]:
+            if p < 0: 
+                print("something wrong") 
+                print(player, src, dst, dice)
+                self.display_board_state()
+                assert 1 == 0
+
         """Check if a move is legal"""
-        # Check if dst is in board range
-        if dst < 0 or dst >= 24: 
-            print("checking dst")
-            # Allow bearing off if all pieces are in the home board
-            if player == 0 and all(point == 0 for point in self.points[player][0:6]):
-                return True
-            elif player == 1 and all(point == 0 for point in self.points[player][18:24]):
-                return True
-            return False
+        if (player == 0 and dst < 0) or (player == 1 and dst >= 24):
+            return True
         
         # Check if src belongs to player
-        if self.points[player][src] == 0: return False
+        if self.points[player][src] <= 0: return False
 
         # Check if dst belongs to player or is empty
         if self.points[1 - player][dst] >= 2: return False
@@ -70,6 +74,10 @@ class Board:
 
         # Check if move is within range of rolled dice
         if abs(dst - src) not in dice: return False
+
+        # Check if bearing off
+        if (player == 0 and dst < 0) or (player == 1 and dst >= 24):
+            return True
 
         # Check if the player is moving in the correct direction
         if player == 0 and dst > src:
@@ -84,16 +92,30 @@ class Board:
                 return False
         return True
 
+    def get_all_possible_moves(self, player, dice):
+        """Generate all possible moves for a player and the dice roll"""
+        moves = []
+        for src in range(24):
+            for d in dice:
+                new_dst = src - d if player == 0 else src + d  # Adjust for player movement direction
+                moves.append((src, new_dst))
+                if player == 0 and new_dst < 0:  # Add additional negative destinations for player 1 bearing off
+                    for i in range(1, abs(new_dst) + 1):
+                        moves.append((src, new_dst - i))
+                elif player == 1 and new_dst >= 24:  # Add additional destinations for player 2 bearing off
+                    for i in range(1, 24 - new_dst + 1):
+                        moves.append((src, new_dst + i))
+        return moves
+
     def get_legal_moves(self, player, dice):
         """Get all legal moves for a player given the dice roll"""
+        all_moves = self.get_all_possible_moves(player, dice)
         legal_moves = []
-        for src in range(24):
-            for dst in range(24):
-                if self.is_legal_move(player, src, dst, dice):
-                    legal_moves.append((src, dst))
-
+        for move in all_moves:
+            if self.is_legal_move(player, move[0], move[1], dice):
+                legal_moves.append(move)
         return legal_moves
-    
+
     def is_game_over(self):
         """Check if the game is over"""
         return self.borne_off[0] == 15 or self.borne_off[1] == 15
