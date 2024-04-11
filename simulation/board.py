@@ -52,16 +52,15 @@ class Board:
         self.borne_off[player] += 1
     
     def is_legal_move(self, player, src, dst, dice):
-        for p in self.points[player]:
-            if p < 0: 
-                print("something wrong") 
-                print(player, src, dst, dice)
-                self.display_board_state()
-                assert 1 == 0
-
         """Check if a move is legal"""
-        if (player == 0 and dst < 0) or (player == 1 and dst >= 24):
-            return True
+        if (player == 0 and dst < 0):
+            if sum(self.points[player][:6]) == 15 - self.borne_off[player]:
+                return True
+            else: return False
+        elif (player == 1 and dst >= 24):
+            if sum(self.points[player][18:]) == 15 - self.borne_off[player]:
+                return True
+            else: return False
         
         # Check if src belongs to player
         if self.points[player][src] <= 0: return False
@@ -87,9 +86,14 @@ class Board:
 
         # Check if pieces on bar that needs to be entered
         if self.bar[player] > 0:
-            # Check dst matches rolled dice
-            if dst != dice[0] and dst != dice[1]:
-                return False
+            # Player can enter anywhere on their open points
+            if player == 1:
+                if self.points[player][dst] == 0:
+                    return True
+            else:
+                # Existing logic for Player 1 entering pieces (matching exact dice value)
+                if dst != dice[0] and dst != dice[1]:
+                    return False
         return True
 
     def get_all_possible_moves(self, player, dice):
@@ -124,7 +128,7 @@ class Board:
         """Reset board to the initial state"""
         self.points = [[0]*24, [0]*24]
         self.bar = [0, 0]
-        self.borne_off[0, 0]
+        self.borne_off = [0, 0]
 
     def calculate_final_score(self):
         """Calculate the final score of the game"""

@@ -22,11 +22,10 @@ def monte_carlo_simulation(num_simulations):
         winner = 0 if board.borne_off[0] == 15 else 1
         wins[winner] += 1
 
-    board.display_board_state()
     return wins
 
-num_simulations = 10000 
+num_simulations = 1000
 results = monte_carlo_simulation(num_simulations)
 
-print("Player 1 wins:", results[0])
-print("Player 2 wins:", results[1])
+print(f"Player 1 wins: {results[0]/num_simulations*100:.1f}% with {results[0]} games")
+print(f"Player 2 wins: {results[1]/num_simulations*100:.1f}% with {results[1]} games")
