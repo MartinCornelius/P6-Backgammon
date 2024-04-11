@@ -7,6 +7,9 @@ def monte_carlo_simulation(num_simulations):
     wins = [0, 0] # Number of wins for each player
 
     for _ in range(num_simulations):
+        if _ % 1000 == 0:
+            print(f"Simulation {_}")
+
         board = Board()
         
         while not board.is_game_over():
@@ -24,7 +27,7 @@ def monte_carlo_simulation(num_simulations):
 
     return wins
 
-num_simulations = 1000
+num_simulations = 10000
 results = monte_carlo_simulation(num_simulations)
 
 print(f"Player 1 wins: {results[0]/num_simulations*100:.1f}% with {results[0]} games")
