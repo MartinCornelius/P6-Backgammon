@@ -27,7 +27,7 @@ def monte_carlo_simulation(num_simulations):
 
     return wins
 
-num_simulations = 10000
+num_simulations = 1000
 results = monte_carlo_simulation(num_simulations)
 
 print(f"Player 1 wins: {results[0]/num_simulations*100:.1f}% with {results[0]} games")
