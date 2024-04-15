@@ -34,3 +34,21 @@ class TestBoard(unittest.TestCase):
 
     def test_hit_piece(self):
         pass
+
+    def test_is_gameover(self):
+        self.board = Board({
+            "points": [[0, 0, 0],[0, 0, 0]],
+            "bar": [0, 0],
+            "borne_off": [0, 15],
+            "current_player": 0
+        })
+        self.assertTrue(self.board.is_game_over())
+    
+    def test_not_gameover(self):
+        self.board = Board({
+            "points": [[0, 0, 0],[0, 0, 0]],
+            "bar": [0, 0],
+            "borne_off": [2, 14],
+            "current_player": 0
+        })
+        self.assertFalse(self.board.is_game_over())
