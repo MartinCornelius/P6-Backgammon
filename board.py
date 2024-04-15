@@ -86,12 +86,10 @@ class Board:
 
         # Check if pieces on bar that needs to be entered
         if self.bar[player] > 0:
-            # Player can enter anywhere on their open points
             if player == 1:
                 if self.points[player][dst] == 0:
                     return True
             else:
-                # Existing logic for Player 1 entering pieces (matching exact dice value)
                 if dst != dice[0] and dst != dice[1]:
                     return False
         return True
@@ -101,12 +99,12 @@ class Board:
         moves = []
         for src in range(24):
             for d in dice:
-                new_dst = src - d if player == 0 else src + d  # Adjust for player movement direction
+                new_dst = src - d if player == 0 else src + d 
                 moves.append((src, new_dst))
-                if player == 0 and new_dst < 0:  # Add additional negative destinations for player 1 bearing off
+                if player == 0 and new_dst < 0: 
                     for i in range(1, abs(new_dst) + 1):
                         moves.append((src, new_dst - i))
-                elif player == 1 and new_dst >= 24:  # Add additional destinations for player 2 bearing off
+                elif player == 1 and new_dst >= 24: 
                     for i in range(1, 24 - new_dst + 1):
                         moves.append((src, new_dst + i))
         return moves
