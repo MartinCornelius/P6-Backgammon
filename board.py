@@ -1,6 +1,7 @@
 # board.py
 
 import random
+import copy
 
 class Board:
     def __init__(self, initial_state=None):
@@ -14,7 +15,7 @@ class Board:
             self.borne_off = [0, 0] # Borne off for player 1 and 2
             self.current_player = 0
         else:
-            self.points = initial_state['points']
+            self.points = copy.deepcopy(initial_state['points'])
             self.bar = initial_state['bar']
             self.borne_off = initial_state['borne_off']
             self.current_player = initial_state['current_player']
@@ -122,12 +123,15 @@ class Board:
         """Check if the game is over"""
         return self.borne_off[0] == 15 or self.borne_off[1] == 15
 
-    def reset_board(self):
-        """Reset board to the initial state"""
-        self.points = [[0]*24, [0]*24]
-        self.bar = [0, 0]
-        self.borne_off = [0, 0]
-
+    def copy(self):
+        """Creates a deep copy of the board"""
+        return Board({
+            'points': [player[:] for player in self.points],
+            'bar': self.bar[:],
+            'borne_off': self.borne_off[:],
+            'current_player': self.current_player
+        })
+        
     def calculate_final_score(self):
         """Calculate the final score of the game"""
         return self.borne_off[0], self.borne_off[1]
