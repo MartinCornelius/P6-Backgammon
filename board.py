@@ -55,9 +55,6 @@ class Board:
                 self.bar[player] -= 1
                 self.points[player][dst] += 1
 
-
-        
-
     def hit_piece(self, player, pos):
         """Hit a piece and place it on the bar"""
         self.points[player][pos] -= 1
@@ -135,9 +132,17 @@ class Board:
         """Get all legal moves for a player given the dice roll"""
         all_moves = self.get_all_possible_moves(player, dice)
         legal_moves = []
-        for move in all_moves:
-            if self.is_legal_move(player, move[0], move[1], dice):
-                legal_moves.append(move)
+        if self.bar[player] > 0:
+            for d in dice:
+                """Checks and makes sure that there are no more than 1 of the enemy pices on the position"""
+                if player == 0 and self.points[1-player][d-1] < 2:
+                    legal_moves.append((0, d))
+                elif player == 1 and self.points[1-player][24-d] < 2:
+                    legal_moves.append((0, d))
+        else:
+            for move in all_moves:
+                if self.is_legal_move(player, move[0], move[1], dice):
+                    legal_moves.append(move)
         return legal_moves
 
     def is_game_over(self):

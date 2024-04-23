@@ -5,6 +5,28 @@ class TestBoard(unittest.TestCase):
     def setUp(self):
         self.board = Board()
 
+    def test_bar_entering(self):
+        self.board = Board({
+            "points": [[0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
+            "bar": [1, 1],
+            "borne_off": [0, 0],
+            "current_player": 0
+        })
+        """Player 1 gets legal moves and moves"""
+        legal_moves = self.board.get_legal_moves(self.board.current_player, (1, 1))
+        if(len(legal_moves) > 0):
+            self.board.move_piece(0, legal_moves[0][0], legal_moves[0][1])
+
+        """Player 2 gets legal moves and moves"""
+        legal_moves = self.board.get_legal_moves(1-self.board.current_player, (1, 1))
+        if(len(legal_moves) > 0):
+            self.board.move_piece(1, legal_moves[1][0], legal_moves[1][1])
+
+        """Check if performed move was correct"""
+        eval = self.board.points[0][0] == 1 and self.board.bar[0] == 0 and self.board.points[1][23] == 1 and self.board.bar[1] == 0
+        self.assertTrue(eval)
+
     def test_initialization(self):
         self.assertEqual(self.board.points, [
             [0, 0, 0, 0, 0, 5, 0, 3, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
@@ -41,19 +63,6 @@ class TestBoard(unittest.TestCase):
         })
         self.board.move_piece(0, 0, 1)
         eval = self.board.points[0][1] == 1 and self.board.points[1][1] != 1
-        self.assertTrue(eval)
-    
-    def test_bar_entering(self):
-        self.board = Board({
-            "points": [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-            "bar": [1, 1],
-            "borne_off": [0, 0],
-            "current_player": 0
-        })
-        self.board.move_piece(0, 0, 1)
-        self.board.move_piece(1, 24, 23)
-        eval = self.board.points[0][0] == 1 and self.board.bar[0] == 0 and self.board.points[1][23] == 1 and self.board.bar[1] == 0
         self.assertTrue(eval)
         
 
