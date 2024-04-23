@@ -33,7 +33,29 @@ class TestBoard(unittest.TestCase):
         pass
 
     def test_hit_piece(self):
-        pass
+        self.board = Board({
+            "points": [[1, 0],[0, 1]],
+            "bar": [0, 0],
+            "borne_off": [0, 0],
+            "current_player": 0
+        })
+        self.board.move_piece(0, 0, 1)
+        eval = self.board.points[0][1] == 1 and self.board.points[1][1] != 1
+        self.assertTrue(eval)
+    
+    def test_bar_entering(self):
+        self.board = Board({
+            "points": [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
+            "bar": [1, 1],
+            "borne_off": [0, 0],
+            "current_player": 0
+        })
+        self.board.move_piece(0, 0, 1)
+        self.board.move_piece(1, 24, 23)
+        eval = self.board.points[0][0] == 1 and self.board.bar[0] == 0 and self.board.points[1][23] == 1 and self.board.bar[1] == 0
+        self.assertTrue(eval)
+        
 
     def test_is_gameover(self):
         self.board = Board({

@@ -25,17 +25,38 @@ class Board:
         return random.randint(1, 6), random.randint(1, 6)
 
     def move_piece(self, player, src, dst):
-        if self.points[player][src] <= 0: return
-        """Move a piece from source to destination point"""
-        if (player == 0 and dst < 0):
-            if sum(self.points[player][:6]) == 15 - self.borne_off[player]:
-                self.bear_off_piece(player, src)
-        elif (player == 1 and dst >= 24):
-            if sum(self.points[player][18:]) == 15 - self.borne_off[player]:
-                self.bear_off_piece(player, src)
+        if self.bar[player] == 0:
+            if self.points[player][src] <= 0: return
+            """Move a piece from source to destination point"""
+            if (player == 0 and dst < 0):
+                if sum(self.points[player][:6]) == 15 - self.borne_off[player]:
+                    self.bear_off_piece(player, src)
+            elif (player == 1 and dst >= 24):
+                if sum(self.points[player][18:]) == 15 - self.borne_off[player]:
+                    self.bear_off_piece(player, src)
+            elif self.points[1-player][dst] == 1:
+                self.points[player][src] -= 1
+                self.points[player][dst] += 1
+                self.hit_piece(1-player, dst)
+            else:
+                self.points[player][src] -= 1
+                self.points[player][dst] += 1
         else:
-            self.points[player][src] -= 1
-            self.points[player][dst] += 1
+            """Move piece from bar if possible"""
+            if player == 0:
+                dst = abs(src - dst)-1
+            else:
+                dst = len(self.points[1])-abs(dst-src)
+            if self.points[1-player][dst] == 1:
+                self.bar[player] -= 1
+                self.points[player][dst] += 1
+                self.hit_piece(1-player, dst)
+            else:
+                self.bar[player] -= 1
+                self.points[player][dst] += 1
+
+
+        
 
     def hit_piece(self, player, pos):
         """Hit a piece and place it on the bar"""
@@ -70,7 +91,7 @@ class Board:
         if self.points[1 - player][dst] >= 2: return False
 
         # Check if dst is blocked
-        if self.points[1 - player][dst] == 1: return False
+        if self.points[1 - player][dst] == 2: return False
 
         # Check if move is within range of rolled dice
         if abs(dst - src) not in dice: return False
