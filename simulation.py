@@ -1,47 +1,51 @@
-# simulation.py
-
 import random
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 from board import Board
-from itertools import product
 
-class MonteCarlo:
-    def __init__(self, board):
-        self.board = board
+def monte_carlo_simulation(num_simulations):
+    wins = [0, 0] # Number of wins for each player
 
-    def simulate_game(self, num_simulations):
-        wins = {(d1, d2): [0, 0] for d1, d2 in product(range(1, 7), repeat=2)}
+    for sim in range(num_simulations):
+        if sim % 1000 == 0:
+            print(f"Simulation {sim}")
 
-        for _ in range(num_simulations):
-            board_copy = self.board.copy()
+        board = Board()
+        
+        while not board.is_game_over():
+            d1, d2 = board.roll_dice()
+            legal_moves = board.get_legal_moves(board.current_player, (d1, d2))
+            if not legal_moves:
+                board.current_player = 1 - board.current_player
+                continue
+            
+            move1 = random.choice(legal_moves)
+            board.move_piece(board.current_player, move1[0], move1[1])
+            legal_moves.remove(move1)
 
-            while not board_copy.is_game_over():
-                d1, d2 = board_copy.roll_dice()
-                legal_moves = board_copy.get_legal_moves(board_copy.current_player, (d1, d2))
-                if not legal_moves:
-                    board_copy.current_player = 1 - board_copy.current_player
-                    continue
-                move = random.choice(legal_moves)
-                board_copy.move_piece(board_copy.current_player, move[0], move[1])
-                board_copy.current_player = 1 - board_copy.current_player
+            if legal_moves:
+                move2 = random.choice(legal_moves)
+                board.move_piece(board.current_player, move2[0], move2[1])
 
-            winner = 0 if board_copy.borne_off[0] == 15 else 1
-            wins[(d1, d2)][winner] += 1
+            board.current_player = 1 - board.current_player
 
-        return wins
+        winner = 0 if board.borne_off[0] == 15 else 1
+        wins[winner] += 1
 
-    def calculate_win_probability(self):
-        num_simulations = 10000
-        wins = self.simulate_game(num_simulations)
+    return wins
 
-        win_probabilities = {}
-        for dice_roll, win_counts in wins.items():
-            total_wins = win_counts[0] + win_counts[1]
-            if total_wins > 0:
-                win_probabilities[dice_roll] = win_counts[0] / total_wins
+num_simulations = 1000
+results = monte_carlo_simulation(num_simulations)
 
-        return win_probabilities
+# Plotting results
+players = ['Player 1', 'Player 2']
+percent_wins = [results[0] / num_simulations * 100, results[1] / num_simulations * 100]
 
-if __name__ == '__main__':
-    board = Board()
-    mc = MonteCarlo(board)
-    print(mc.calculate_win_probability())
+df = pd.DataFrame({'Player': players, 'Win Percentage': percent_wins})
+df.plot(kind='bar', x='Player', y='Win Percentage', color=['blue', 'green'])
+plt.title('Win Percentage by Player')
+plt.ylabel('Win Percentage')
+plt.xlabel('Player')
+plt.ylim(0, 100)
+plt.show()
