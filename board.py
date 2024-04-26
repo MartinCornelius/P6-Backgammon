@@ -52,7 +52,7 @@ class Board:
         self.points[player][pos] -= 1
         self.borne_off[player] += 1
     
-    def is_legal_move(self, player, src, dst, dice):
+    def is_legal_move(self, player, src, dst, die):
         """Check if a move is legal"""
         if (player == 0 and dst < 0):
             if sum(self.points[player][:6]) == 15 - self.borne_off[player]:
@@ -73,7 +73,7 @@ class Board:
         if self.points[1 - player][dst] == 1: return False
 
         # Check if move is within range of rolled dice
-        if abs(dst - src) not in dice: return False
+        if abs(dst - src) != die: return False
 
         # Check if bearing off
         if (player == 0 and dst < 0) or (player == 1 and dst >= 24):
@@ -91,31 +91,30 @@ class Board:
                 if self.points[player][dst] == 0:
                     return True
             else:
-                if dst != dice[0] and dst != dice[1]:
+                if dst != die:
                     return False
         return True
 
-    def get_all_possible_moves(self, player, dice):
+    def get_all_possible_moves(self, player, die):
         """Generate all possible moves for a player and the dice roll"""
         moves = []
         for src in range(24):
-            for d in dice:
-                new_dst = src - d if player == 0 else src + d 
-                moves.append((src, new_dst))
-                if player == 0 and new_dst < 0: 
-                    for i in range(1, abs(new_dst) + 1):
-                        moves.append((src, new_dst - i))
-                elif player == 1 and new_dst >= 24: 
-                    for i in range(1, 24 - new_dst + 1):
-                        moves.append((src, new_dst + i))
+            new_dst = src - die if player == 0 else src + die 
+            moves.append((src, new_dst))
+            if player == 0 and new_dst < 0: 
+                for i in range(1, abs(new_dst) + 1):
+                    moves.append((src, new_dst - i))
+            elif player == 1 and new_dst >= 24: 
+                for i in range(1, 24 - new_dst + 1):
+                    moves.append((src, new_dst + i))
         return moves
 
-    def get_legal_moves(self, player, dice):
+    def get_legal_moves(self, player, die):
         """Get all legal moves for a player given the dice roll"""
-        all_moves = self.get_all_possible_moves(player, dice)
+        all_moves = self.get_all_possible_moves(player, die)
         legal_moves = []
         for move in all_moves:
-            if self.is_legal_move(player, move[0], move[1], dice):
+            if self.is_legal_move(player, move[0], move[1], die):
                 legal_moves.append(move)
         return legal_moves
 
