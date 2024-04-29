@@ -52,3 +52,20 @@ class TestBoard(unittest.TestCase):
             "current_player": 0
         })
         self.assertFalse(self.board.is_game_over())
+
+    def test_get_all_possible_moves_returns_actual_moves(self):
+        # Arrange
+        self.board = Board({
+            "points": [[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],[1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
+            "bar": [0, 0],
+            "borne_off": [0, 14],
+            "current_player": 1
+        })
+        
+        # Act
+        dice = 1, 2
+        all_moves = self.board.get_all_possible_moves(self.board.current_player, dice)
+        expected_moves = [(0, 1), (0, 2)]
+
+        # Assert
+        self.assertEquals(all_moves, expected_moves)
