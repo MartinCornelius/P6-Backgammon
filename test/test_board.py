@@ -52,3 +52,22 @@ class TestBoard(unittest.TestCase):
             "current_player": 0
         })
         self.assertFalse(self.board.is_game_over())
+
+    def test_overshoot_only_legal_move(self):
+        # Arrange
+        self.board = Board({
+            "points": [[1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0],[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ,0]],
+            "bar": [0, 0],
+            "borne_off": [13, 0],
+            "current_player": 0
+        })
+        dice = 5, 6
+
+        # Act
+        legal_moves = self.board.get_legal_moves(self.board.current_player, dice)
+        print(f"legal_moves: {legal_moves}")
+        only_move = [(2,-3),(2,-4)]
+        print(f"only_move: {only_move}")
+
+        # Assert
+        self.assertEquals(legal_moves, only_move)
