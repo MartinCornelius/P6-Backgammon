@@ -25,17 +25,26 @@ class Board:
         return random.randint(1, 6), random.randint(1, 6)
 
     def move_piece(self, player, src, dst):
-        if self.points[player][src] <= 0: return
-        """Move a piece from source to destination point"""
-        if (player == 0 and dst < 0):
-            if sum(self.points[player][:6]) == 15 - self.borne_off[player]:
+        if self.bar[player] == 0:
+            if self.points[player][src] <= 0: return
+            """Move a piece from source to destination point"""
+            if (player == 0 and dst < 0):
                 self.bear_off_piece(player, src)
-        elif (player == 1 and dst >= 24):
-            if sum(self.points[player][18:]) == 15 - self.borne_off[player]:
+            elif (player == 1 and dst >= 24):
                 self.bear_off_piece(player, src)
+            elif self.points[1-player][dst] == 1:
+                self.points[player][src] -= 1
+                self.points[player][dst] += 1
+                self.hit_piece(1-player, dst)
+            else:
+                self.points[player][src] -= 1
+                self.points[player][dst] += 1
         else:
-            self.points[player][src] -= 1
+            """Move piece from bar if possible"""
+            self.bar[player] -= 1
             self.points[player][dst] += 1
+            if self.points[1-player][dst] == 1:
+                self.hit_piece(1-player, dst)
 
     def hit_piece(self, player, pos):
         """Hit a piece and place it on the bar"""
@@ -66,11 +75,8 @@ class Board:
         # Check if src belongs to player
         if self.points[player][src] <= 0: return False
 
-        # Check if dst belongs to player or is empty
-        if self.points[1 - player][dst] >= 2: return False
-
         # Check if dst is blocked
-        if self.points[1 - player][dst] == 1: return False
+        if self.points[1 - player][dst] >= 2: return False
 
         # Check if move is within range of rolled dice
         if abs(dst - src) not in dice: return False
@@ -109,9 +115,17 @@ class Board:
         """Get all legal moves for a player given the dice roll"""
         all_moves = self.get_all_possible_moves(player, dice)
         legal_moves = []
-        for move in all_moves:
-            if self.is_legal_move(player, move[0], move[1], dice):
-                legal_moves.append(move)
+        if self.bar[player] > 0:
+            for d in dice:
+                """Checks and makes sure that there are no more than 1 of the enemy pices on the position"""
+                if player == 0 and self.points[1-player][24-d] < 2:
+                    legal_moves.append((0, 24-d))
+                elif player == 1 and self.points[1-player][d-1] < 2:
+                    legal_moves.append((0, d-1))
+        else:
+            for move in all_moves:
+                if self.is_legal_move(player, move[0], move[1], dice):
+                    legal_moves.append(move)
         return legal_moves
 
     def is_game_over(self):
