@@ -22,7 +22,12 @@ class Board:
 
     def roll_dice(self):
         """Simulate rolling two dice"""
-        return random.randint(1, 6), random.randint(1, 6)
+        Dice_list = [random.randint(1, 6), random.randint(1, 6)]
+        if(Dice_list[0] == D[1]):
+            Dice_list.append(D[0])
+            Dice_list.append(D[0])
+            
+        return Dice_list
 
     def move_piece(self, player, src, dst):
         if self.points[player][src] <= 0: return
