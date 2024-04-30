@@ -132,9 +132,9 @@ class Board:
         if self.bar[player] > 0:
             for d in dice:
                 """Checks and makes sure that there are no more than 1 of the enemy pices on the position"""
-                if player == 0 and self.points[1-player][d-1] < 2:
+                if player == 0 and self.points[1-player][24-d] < 2:
                     legal_moves.append((0, d))
-                elif player == 1 and self.points[1-player][24-d] < 2:
+                elif player == 1 and self.points[1-player][d-1] < 2:
                     legal_moves.append((0, d))
         else:
             for move in all_moves:
