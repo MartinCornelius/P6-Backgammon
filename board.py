@@ -84,11 +84,8 @@ class Board:
         # Check if src belongs to player
         if self.points[player][src] <= 0: return False
 
-        # Check if dst belongs to player or is empty
-        if self.points[1 - player][dst] >= 2: return False
-
         # Check if dst is blocked
-        if self.points[1 - player][dst] == 2: return False
+        if self.points[1 - player][dst] >= 2: return False
 
         # Check if move is within range of rolled dice
         if abs(dst - src) not in dice: return False
