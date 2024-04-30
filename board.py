@@ -43,13 +43,10 @@ class Board:
                 self.points[player][dst] += 1
         else:
             """Move piece from bar if possible"""
+            self.bar[player] -= 1
+            self.points[player][dst] += 1
             if self.points[1-player][dst] == 1:
-                self.bar[player] -= 1
-                self.points[player][dst] += 1
                 self.hit_piece(1-player, dst)
-            else:
-                self.bar[player] -= 1
-                self.points[player][dst] += 1
 
     def hit_piece(self, player, pos):
         """Hit a piece and place it on the bar"""
