@@ -1,5 +1,7 @@
 import unittest
+import random
 from board import Board
+
 
 class TestBoard(unittest.TestCase):
     def setUp(self):
@@ -15,9 +17,22 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(self.board.current_player, 0)
 
     def test_roll_dice(self):
-        dice1, dice2 = self.board.roll_dice()
-        self.assertTrue(1 <= dice1 <= 6)
-        self.assertTrue(1 <= dice2 <= 6)
+        # Test roll_dice is within range
+        dice_list = self.board.roll_dice()
+        self.assertTrue(1 <= dice_list[0] <= 6)
+        self.assertTrue(1 <= dice_list[1] <= 6)
+        # Test roll_dice insert correctly into list.
+        random.seed(42)
+        dice_list = self.board.roll_dice()
+        self.assertEqual(dice_list[0], 6)
+        self.assertEqual(dice_list[1], 1)
+        # Test doubling in roll_dice
+        random.seed(0)
+        dice_list = self.board.roll_dice()
+        self.assertEqual(dice_list[0], 4)
+        self.assertEqual(dice_list[1], 4)
+        self.assertEqual(dice_list[2], 4)
+        self.assertEqual(dice_list[3], 4)
 
     def test_move_piece(self):
         # Test moving a piece from a point to another

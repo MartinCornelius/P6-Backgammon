@@ -23,9 +23,9 @@ class Board:
     def roll_dice(self):
         """Simulate rolling two dice"""
         dice_list = [random.randint(1, 6), random.randint(1, 6)]
-        if(dice_list[0] == D[1]):
-            dice_list.append(D[0])
-            dice_list.append(D[0])
+        if(dice_list[0] == dice_list[1]):
+            dice_list.append(dice_list[0])
+            dice_list.append(dice_list[0])
             
         return dice_list
 
