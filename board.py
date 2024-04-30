@@ -43,10 +43,6 @@ class Board:
                 self.points[player][dst] += 1
         else:
             """Move piece from bar if possible"""
-            if player == 0:
-                dst = abs(src - dst)-1
-            else:
-                dst = len(self.points[1])-abs(dst-src)
             if self.points[1-player][dst] == 1:
                 self.bar[player] -= 1
                 self.points[player][dst] += 1
@@ -133,9 +129,9 @@ class Board:
             for d in dice:
                 """Checks and makes sure that there are no more than 1 of the enemy pices on the position"""
                 if player == 0 and self.points[1-player][24-d] < 2:
-                    legal_moves.append((0, d))
+                    legal_moves.append((0, 24-d))
                 elif player == 1 and self.points[1-player][d-1] < 2:
-                    legal_moves.append((0, d))
+                    legal_moves.append((0, d-1))
         else:
             for move in all_moves:
                 if self.is_legal_move(player, move[0], move[1], dice):
