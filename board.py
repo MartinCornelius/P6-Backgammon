@@ -103,12 +103,6 @@ class Board:
                 for d in dice:
                     new_dst = src - d if player == 0 else src + d 
                     moves.append((src, new_dst))
-                    if player == 0 and new_dst < 0: 
-                        for j in range(1, abs(new_dst) + 1):
-                            moves.append((src, new_dst - j))
-                    elif player == 1 and new_dst >= 24: 
-                        for j in range(1, 24 - new_dst + 1):
-                            moves.append((src, new_dst + j))
         return moves
 
     def get_legal_moves(self, player, dice):
