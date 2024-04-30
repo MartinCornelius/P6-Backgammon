@@ -15,7 +15,7 @@ def monte_carlo_simulation(num_simulations):
         
         while not board.is_game_over():
             dice_list = board.roll_dice()
-            legal_moves = board.get_legal_moves(board.current_player, (dice_list[0], dice_list[1]))
+            legal_moves = board.get_legal_moves(board.current_player, dice_list[0])
             if not legal_moves:
                 board.current_player = 1 - board.current_player
                 continue

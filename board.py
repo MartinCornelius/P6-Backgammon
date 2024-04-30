@@ -66,7 +66,7 @@ class Board:
         self.points[player][pos] -= 1
         self.borne_off[player] += 1
     
-    def is_legal_move(self, player, src, dst, dice):
+    def is_legal_move(self, player, src, dst, d):
         """Check if a move is legal"""
         if (player == 0 and dst == -1):
             if (sum(self.points[player][:6]) == 15 - self.borne_off[player]):
@@ -92,7 +92,7 @@ class Board:
         if self.points[1 - player][dst] >= 2: return False
 
         # Check if move is within range of rolled dice
-        if abs(dst - src) not in dice: return False
+        if abs(dst - src) != d: return False
 
         # Check if bearing off
         if (player == 0 and dst < 0) or (player == 1 and dst >= 24):
@@ -106,38 +106,36 @@ class Board:
 
         # Check if pieces on bar that needs to be entered
         if self.bar[player] > 0:
+            if player == 0:
+                if dst != 24 - d:
+                    return False
             if player == 1:
-                if self.points[player][dst] == 0:
-                    return True
-            else:
-                if dst != dice[0] and dst != dice[1]:
+                if dst != d - 1:
                     return False
         return True
 
-    def get_all_possible_moves(self, player, dice):
+    def get_all_possible_moves(self, player, d):
         """Generate all possible moves for a player and the dice roll"""
         moves = []
         for src, pieces in enumerate(self.points[player]):
             if pieces > 0:
-                for d in dice:
-                    new_dst = src - d if player == 0 else src + d 
-                    moves.append((src, new_dst))
+                new_dst = src - d if player == 0 else src + d 
+                moves.append((src, new_dst))
         return moves
 
-    def get_legal_moves(self, player, dice):
+    def get_legal_moves(self, player, d):
         """Get all legal moves for a player given the dice roll"""
-        all_moves = self.get_all_possible_moves(player, dice)
+        all_moves = self.get_all_possible_moves(player, d)
         legal_moves = []
         if self.bar[player] > 0:
-            for d in dice:
-                """Checks and makes sure that there are no more than 1 of the enemy pices on the position"""
-                if player == 0 and self.points[1-player][24-d] < 2:
-                    legal_moves.append((0, 24-d))
-                elif player == 1 and self.points[1-player][d-1] < 2:
-                    legal_moves.append((0, d-1))
+            """Checks and makes sure that there are no more than 1 of the enemy pices on the position"""
+            if player == 0 and self.points[1-player][24-d] < 2:
+                legal_moves.append((0, 24-d))
+            elif player == 1 and self.points[1-player][d-1] < 2:
+                legal_moves.append((0, d-1))
         else:
             for move in all_moves:
-                if self.is_legal_move(player, move[0], move[1], dice):
+                if self.is_legal_move(player, move[0], move[1], d):
                     legal_moves.append(move)
         return legal_moves
 
