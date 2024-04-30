@@ -68,12 +68,20 @@ class Board:
     
     def is_legal_move(self, player, src, dst, dice):
         """Check if a move is legal"""
-        if (player == 0 and dst < 0):
-            if sum(self.points[player][:6]) == 15 - self.borne_off[player]:
+        if (player == 0 and dst == -1):
+            if (sum(self.points[player][:6]) == 15 - self.borne_off[player]):
                 return True
             else: return False
-        elif (player == 1 and dst >= 24):
+        elif (player == 0 and dst < -1):
+            if(sum(self.points[player][:src+1]) == 15 - self.borne_off[player]):
+                return True
+            else: return False
+        elif (player == 1 and dst == 24):
             if sum(self.points[player][18:]) == 15 - self.borne_off[player]:
+                return True
+            else: return False
+        elif (player == 1 and dst > 24):
+            if(sum(self.points[player][src:]) == 15 - self.borne_off[player]):
                 return True
             else: return False
         
