@@ -29,11 +29,9 @@ class Board:
             if self.points[player][src] <= 0: return
             """Move a piece from source to destination point"""
             if (player == 0 and dst < 0):
-                if sum(self.points[player][:6]) == 15 - self.borne_off[player]:
-                    self.bear_off_piece(player, src)
+                self.bear_off_piece(player, src)
             elif (player == 1 and dst >= 24):
-                if sum(self.points[player][18:]) == 15 - self.borne_off[player]:
-                    self.bear_off_piece(player, src)
+                self.bear_off_piece(player, src)
             elif self.points[1-player][dst] == 1:
                 self.points[player][src] -= 1
                 self.points[player][dst] += 1
