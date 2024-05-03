@@ -15,18 +15,22 @@ def monte_carlo_simulation(num_simulations):
         
         while not board.is_game_over():
             dice_list = board.roll_dice()
-            legal_moves = board.get_legal_moves(board.current_player, (dice_list[0], dice_list[1]))
-            if not legal_moves:
-                board.current_player = 1 - board.current_player
-                continue
-            
-            move1 = random.choice(legal_moves)
-            board.move_piece(board.current_player, move1[0], move1[1])
-            legal_moves.remove(move1)
+            blocked_dice_list = []
+            for _ in dice_list:
+                blocked_dice_list.append(False)
+            while len(dice_list) > 0 and False in blocked_dice_list:
+                for i, d in enumerate(dice_list):
+                    legal_moves = board.get_legal_moves(board.current_player, d)
 
-            if legal_moves:
-                move2 = random.choice(legal_moves)
-                board.move_piece(board.current_player, move2[0], move2[1])
+                    if not legal_moves:
+                        blocked_dice_list[i] = True
+                    else:
+                        move = random.choice(legal_moves)
+                        board.move_piece(board.current_player, move[0], move[1])
+                        dice_list.remove(d)
+                        blocked_dice_list = []
+                        for _ in dice_list:
+                            blocked_dice_list.append(False)
 
             board.current_player = 1 - board.current_player
 
