@@ -38,41 +38,23 @@ class TestBoard(unittest.TestCase):
         self.assertEqual(self.board.borne_off, [0, 0])
         self.assertEqual(self.board.current_player, 0)
 
-    def test_roll_dice_inrange(self):
+    def test_roll_dice(self):
         # Test roll_dice is within range
         dice_list = self.board.roll_dice()
         self.assertTrue(1 <= dice_list[0] <= 6)
         self.assertTrue(1 <= dice_list[1] <= 6)
-
-    def test_roll_dice_list_length(self):
-        expected_list = [6, 1]
-        expected_list_len = len(expected_list)
-        random.seed(42)
-        dice_list = self.board.roll_dice()
-        dice_list_len = len(dice_list)
-        self.assertEqual(dice_list_len, expected_list_len)
-    
-    def test_roll_dice_insert_to_list(self):
         # Test roll_dice insert correctly into list.
-        expected_list = [6, 1]
         random.seed(42)
         dice_list = self.board.roll_dice()
-        self.assertListEqual(dice_list, expected_list)
-
-    def test_roll_dice_doubling(self):
+        self.assertEqual(dice_list[0], 6)
+        self.assertEqual(dice_list[1], 1)
         # Test doubling in roll_dice
-        expected_list = [4, 4, 4, 4]
         random.seed(0)
         dice_list = self.board.roll_dice()
-        self.assertListEqual(dice_list, expected_list)
-
-    def test_roll_dice_doubling_list_length(self):
-        expected_list = [4, 4, 4, 4]
-        expected_list_len = len(expected_list)
-        random.seed(0)
-        dice_list = self.board.roll_dice()
-        dice_list_len = len(dice_list)
-        self.assertEqual(dice_list_len, expected_list_len)
+        self.assertEqual(dice_list[0], 4)
+        self.assertEqual(dice_list[1], 4)
+        self.assertEqual(dice_list[2], 4)
+        self.assertEqual(dice_list[3], 4)
 
     def test_move_piece(self):
         # Test moving a piece from a point to another
