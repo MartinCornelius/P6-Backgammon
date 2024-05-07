@@ -5,10 +5,6 @@ import matplotlib.pyplot as plt
 from board import Board
 
 def is_duplicate(board, b):
-    print("________________________________")
-    board.display_board_state()
-    b.display_board_state()
-    print("________________________________")
     if board.current_player != b.current_player:
         return False
     if board.bar[0] != b.bar[0] or board.bar[1] != b.bar[1]:
@@ -100,14 +96,11 @@ def get_possible_starting_moves(dice, initial_board):
                         is_dup = True
                 if is_dup == False:
                     boards.append(temp_board)
-        print(len(boards))
     
     return boards
 
 def monte_carlo_simulation(num_simulations, dice, initial_board = None):
     boards = get_possible_starting_moves(dice, initial_board)
-    #for board in boards:
-    #    print(board.points)
     wins = [] # list of player 1 and 2 wins for each opening move
     for index, curr_board in enumerate(boards):
         wins.append([0,0])
@@ -145,31 +138,36 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None):
 
     return wins
 
-num_simulations = 10
+num_simulations = 1000
 
 initial_board = {
-            "points": [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            "points": [[0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
             "bar": [0, 1],
-            "borne_off": [13, 14],
+            "borne_off": [0, 14],
             "current_player": 0
         }
 
-results = monte_carlo_simulation(num_simulations, [1, 1], initial_board)
+results = monte_carlo_simulation(num_simulations, [1, 1])
 print(f"{len(results)} different starting moves")
 biggest = 0
-for result in results:
-    biggest = result if result > biggest else biggest
-print(f"Player 1 highest winrate: {100*(biggest)}% with move: ")
+for i in range(len(results)):
+    biggest = i if results[i][0] > results[biggest][0] else biggest
+print(f"Player 1 highest winrate: {100*(results[biggest][0]/num_simulations)}% with move: {biggest}")
 
 # Plotting results
-players = ['Player 1', 'Player 2']
-percent_wins = [results[0] / num_simulations * 100, results[1] / num_simulations * 100]
+moves = []
+percent_wins = []
+colors = []
+for i in range(len(results)):
+    moves.append(f"Move {i+1}")
+    percent_wins.append(results[i][0] / num_simulations * 100)
+    colors.append("magenta")
 
-df = pd.DataFrame({'Player': players, 'Win Percentage': percent_wins})
-df.plot(kind='bar', x='Player', y='Win Percentage', color=['blue', 'green'])
-plt.title('Win Percentage by Player')
+df = pd.DataFrame({'Move': moves, 'Win Percentage': percent_wins})
+df.plot(kind='bar', x='Move', y='Win Percentage', color=colors)
+plt.title('Win Percentage by Starting Move')
 plt.ylabel('Win Percentage')
-plt.xlabel('Player')
+plt.xlabel('Starting move')
 plt.ylim(0, 100)
 plt.show()
