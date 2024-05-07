@@ -25,7 +25,6 @@ def get_possible_starting_moves(dice, initial_board):
     if dice[0] != dice[1]:
         for d in dice:
             d2 = dice[0] if d == dice[1] else dice[1]
-
             first_moves = init_board.get_legal_moves(init_board.current_player, d)
             first_boards = []
             for move in first_moves:
@@ -36,7 +35,7 @@ def get_possible_starting_moves(dice, initial_board):
                     if is_duplicate(temp_board, b[0]):
                         is_dup = True
                 if is_dup == False:
-                    first_boards.append((temp_board, [move[0], move[1]]))
+                    first_boards.append((temp_board, [[move[0], move[1]]]))
             for board in first_boards:
                 second_moves = board[0].get_legal_moves(board[0].current_player, d2)
                 for move2 in second_moves:
@@ -47,8 +46,9 @@ def get_possible_starting_moves(dice, initial_board):
                         if is_duplicate(temp_board, b[0]):
                             is_dup = True
                     if is_dup == False:
-                        boards.append((temp_board, [board[1], [move2[0], move2[1]]]))
-        print(f"{len(boards)} boards and move lists")
+                        temp_moves_list = board[1].copy()
+                        temp_moves_list.append([move2[0], move2[1]])
+                        boards.append((temp_board, temp_moves_list))
             
     else:
         d = dice[0]
@@ -59,45 +59,51 @@ def get_possible_starting_moves(dice, initial_board):
             temp_board.move_piece(temp_board.current_player, move1[0], move1[1])
             is_dup = False
             for b in first_boards:
-                if is_duplicate(temp_board, b):
+                if is_duplicate(temp_board, b[0]):
                     is_dup = True
             if is_dup == False:
-                first_boards.append(temp_board)
+                first_boards.append((temp_board, [[move1[0], move1[1]]]))
         second_boards = []
         for board in first_boards:
-            second_moves = board.get_legal_moves(board.current_player, d)
+            second_moves = board[0].get_legal_moves(board[0].current_player, d)
             for move2 in second_moves:
-                temp_board = board.copy()
+                temp_board = board[0].copy()
                 temp_board.move_piece(temp_board.current_player, move2[0], move2[1])
                 is_dup = False
                 for b in second_boards:
-                    if is_duplicate(temp_board, b):
+                    if is_duplicate(temp_board, b[0]):
                         is_dup = True
                 if is_dup == False:
-                    second_boards.append(temp_board)
+                    temp_moves_list = board[1].copy()
+                    temp_moves_list.append([move2[0], move2[1]])
+                    second_boards.append((temp_board, temp_moves_list))
         third_boards = []
         for board in second_boards:
-            third_moves = board.get_legal_moves(board.current_player, d)
+            third_moves = board[0].get_legal_moves(board[0].current_player, d)
             for move3 in third_moves:
-                temp_board = board.copy()
+                temp_board = board[0].copy()
                 temp_board.move_piece(temp_board.current_player, move3[0], move3[1])
                 is_dup = False
                 for b in third_boards:
-                    if is_duplicate(temp_board, b):
+                    if is_duplicate(temp_board, b[0]):
                         is_dup = True
                 if is_dup == False:
-                    third_boards.append(temp_board)
+                    temp_moves_list = board[1].copy()
+                    temp_moves_list.append([move3[0], move3[1]])
+                    third_boards.append((temp_board, temp_moves_list))
         for board in third_boards:
-            fourth_moves = board.get_legal_moves(board.current_player, d)
+            fourth_moves = board[0].get_legal_moves(board[0].current_player, d)
             for move4 in fourth_moves:
-                temp_board = board.copy()
+                temp_board = board[0].copy()
                 temp_board.move_piece(temp_board.current_player, move4[0], move4[1])
                 is_dup = False
                 for b in boards:
-                    if is_duplicate(temp_board, b):
+                    if is_duplicate(temp_board, b[0]):
                         is_dup = True
                 if is_dup == False:
-                    boards.append(temp_board)
+                    temp_moves_list = board[1].copy()
+                    temp_moves_list.append([move4[0], move4[1]])
+                    boards.append((temp_board, temp_moves_list))
     
     return boards
 
@@ -142,7 +148,7 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None):
 
     return wins, first_moves
 
-num_simulations = 10
+num_simulations = 1000
 
 initial_board = {
             "points": [[0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
@@ -152,7 +158,7 @@ initial_board = {
             "current_player": 0
         }
 
-results, opening_moves = monte_carlo_simulation(num_simulations, [1, 2])
+results, opening_moves = monte_carlo_simulation(num_simulations, [3, 4])
 print(f"{len(results)} different opening moves")
 biggest = 0
 for i in range(len(results)):
