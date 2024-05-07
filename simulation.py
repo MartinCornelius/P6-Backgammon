@@ -19,6 +19,7 @@ def is_duplicate(board, b):
     return True
 
 def get_possible_starting_moves(dice, initial_board):
+    # list of tuples: (board, moves_list)
     boards = []
     init_board = Board(initial_board)
     if dice[0] != dice[1]:
@@ -32,21 +33,22 @@ def get_possible_starting_moves(dice, initial_board):
                 temp_board.move_piece(temp_board.current_player, move[0], move[1])
                 is_dup = False
                 for b in first_boards:
-                    if is_duplicate(temp_board, b):
+                    if is_duplicate(temp_board, b[0]):
                         is_dup = True
                 if is_dup == False:
-                    first_boards.append(temp_board)
+                    first_boards.append((temp_board, [move[0], move[1]]))
             for board in first_boards:
-                second_moves = board.get_legal_moves(board.current_player, d2)
+                second_moves = board[0].get_legal_moves(board[0].current_player, d2)
                 for move2 in second_moves:
-                    temp_board = board.copy()
-                    temp_board.move_piece(board.current_player, move2[0], move2[1])
+                    temp_board = board[0].copy()
+                    temp_board.move_piece(temp_board.current_player, move2[0], move2[1])
                     is_dup = False
                     for b in boards:
-                        if is_duplicate(temp_board, b):
+                        if is_duplicate(temp_board, b[0]):
                             is_dup = True
                     if is_dup == False:
-                        boards.append(temp_board)
+                        boards.append((temp_board, [board[1], [move2[0], move2[1]]]))
+        print(f"{len(boards)} boards and move lists")
             
     else:
         d = dice[0]
@@ -102,14 +104,16 @@ def get_possible_starting_moves(dice, initial_board):
 def monte_carlo_simulation(num_simulations, dice, initial_board = None):
     boards = get_possible_starting_moves(dice, initial_board)
     wins = [] # list of player 1 and 2 wins for each opening move
+    first_moves = [] # list of src-dst moves to represent opening move
     for index, curr_board in enumerate(boards):
         wins.append([0,0])
+        first_moves.append(curr_board[1])
 
         for sim in range(num_simulations):
             if sim % 1000 == 0:
                 print(f"Simulation {sim}")
 
-            board = curr_board.copy()
+            board = curr_board[0].copy()
             
             while not board.is_game_over():
                 dice_list = board.roll_dice()
@@ -136,9 +140,9 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None):
             winner = 0 if board.borne_off[0] == 15 else 1
             wins[index][winner] += 1
 
-    return wins
+    return wins, first_moves
 
-num_simulations = 1000
+num_simulations = 10
 
 initial_board = {
             "points": [[0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
@@ -148,12 +152,12 @@ initial_board = {
             "current_player": 0
         }
 
-results = monte_carlo_simulation(num_simulations, [1, 1])
-print(f"{len(results)} different starting moves")
+results, opening_moves = monte_carlo_simulation(num_simulations, [1, 2])
+print(f"{len(results)} different opening moves")
 biggest = 0
 for i in range(len(results)):
     biggest = i if results[i][0] > results[biggest][0] else biggest
-print(f"Player 1 highest winrate: {100*(results[biggest][0]/num_simulations)}% with move: {biggest}")
+print(f"Player 1 highest winrate: {100*(results[biggest][0]/num_simulations)}% with move: {opening_moves[biggest]}")
 
 # Plotting results
 moves = []
@@ -166,8 +170,8 @@ for i in range(len(results)):
 
 df = pd.DataFrame({'Move': moves, 'Win Percentage': percent_wins})
 df.plot(kind='bar', x='Move', y='Win Percentage', color=colors)
-plt.title('Win Percentage by Starting Move')
+plt.title('Win Percentage by Opening Move')
 plt.ylabel('Win Percentage')
-plt.xlabel('Starting move')
+plt.xlabel('Opening Move')
 plt.ylim(0, 100)
 plt.show()
