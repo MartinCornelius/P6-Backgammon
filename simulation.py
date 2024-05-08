@@ -107,7 +107,7 @@ def get_possible_starting_moves(dice, initial_board):
     
     return boards
 
-def monte_carlo_simulation(num_simulations, dice, initial_board = None):
+def monte_carlo_simulation(num_simulations, dice, initial_board = None, heuristic = random.choice):
     boards = get_possible_starting_moves(dice, initial_board)
     wins = [] # list of player 1 and 2 wins for each opening move
     first_moves = [] # list of src-dst moves to represent opening move
@@ -133,7 +133,7 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None):
                         if not legal_moves:
                             blocked_dice_list[i] = True
                         else:
-                            move = random.choice(legal_moves)
+                            move = heuristic(legal_moves)
                             board.move_piece(board.current_player, move[0], move[1])
 
                             dice_list.remove(d)
@@ -161,9 +161,12 @@ initial_board = {
 results, opening_moves = monte_carlo_simulation(num_simulations, [3, 4])
 print(f"{len(results)} different opening moves")
 biggest = 0
+lowest = 0
 for i in range(len(results)):
     biggest = i if results[i][0] > results[biggest][0] else biggest
+    lowest = i if results[i][0] < results[lowest][0] else lowest
 print(f"Player 1 highest winrate: {100*(results[biggest][0]/num_simulations)}% with move: {opening_moves[biggest]}")
+print(f"Player 1 lowest winrate: {100*(results[lowest][0]/num_simulations)}% with move: {opening_moves[lowest]}")
 
 # Plotting results
 moves = []
