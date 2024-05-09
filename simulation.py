@@ -1,8 +1,8 @@
-import random
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from board import Board
+import heuristics
 
 def is_duplicate(board, b):
     if board.current_player != b.current_player:
@@ -109,7 +109,7 @@ def get_possible_starting_moves(dice, initial_board):
     
     return boards
 
-def monte_carlo_simulation(num_simulations, dice, initial_board = None, heuristic = random.choice):
+def monte_carlo_simulation(num_simulations, dice, initial_board = None, heuristic = heuristics.random):
     boards = get_possible_starting_moves(dice, initial_board)
     wins = [] # list of player 1 and 2 wins for each opening move
     first_moves = [] # list of src-dst moves to represent opening move
@@ -160,7 +160,7 @@ initial_board = {
             "current_player": 0
         }
 
-results, opening_moves = monte_carlo_simulation(num_simulations, [3, 4])
+results, opening_moves = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
 print(f"{len(results)} different opening moves")
 biggest = 0
 lowest = 0
