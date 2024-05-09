@@ -41,6 +41,7 @@ def get_possible_starting_moves(dice, initial_board):
                 for move2 in second_moves:
                     temp_board = board[0].copy()
                     temp_board.move_piece(temp_board.current_player, move2[0], move2[1])
+                    temp_board.current_player = 1 - temp_board.current_player
                     is_dup = False
                     for b in boards:
                         if is_duplicate(temp_board, b[0]):
@@ -96,6 +97,7 @@ def get_possible_starting_moves(dice, initial_board):
             for move4 in fourth_moves:
                 temp_board = board[0].copy()
                 temp_board.move_piece(temp_board.current_player, move4[0], move4[1])
+                temp_board.current_player = 1 - temp_board.current_player
                 is_dup = False
                 for b in boards:
                     if is_duplicate(temp_board, b[0]):
