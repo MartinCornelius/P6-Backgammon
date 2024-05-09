@@ -4,6 +4,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from board import Board
 
+def every_dice_simulation(num_simulations, initial_board = None):
+    pass
+
 def is_duplicate(board, b):
     if board.current_player != b.current_player:
         return False
@@ -161,6 +164,7 @@ initial_board = {
         }
 
 results, opening_moves = monte_carlo_simulation(num_simulations, [3, 4])
+# results, opening_moves = every_dice_simulation(num_simulations, initial_board)
 print(f"{len(results)} different opening moves")
 biggest = 0
 for i in range(len(results)):
