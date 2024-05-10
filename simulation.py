@@ -188,10 +188,12 @@ initial_board = {
 
 dice_pairs, average_winrates, highest_winrates, best_moves,  = every_dice_simulation(num_simulations)
 
-df = pd.DataFrame({'Dice Pair': dice_pairs, 'Average Win%': average_winrates, 'Highest Win%': highest_winrates, 'Best Move': best_moves})
 if not os.path.exists("logs"):
     os.mkdir("logs")
-df.to_csv(f"logs/{len(os.listdir('logs')) + 1 }.csv")
+file = open(f"logs/{len(os.listdir('logs')) + 1}.txt", "w")
+file.write("Dice Pair;Average Win%;Highest Win%;Best Move\n")
+for i in range(len(dice_pairs)):
+    file.write(f"{dice_pairs[i]};{average_winrates[i]:.2f};{highest_winrates[i]:.2f};{best_moves[i]}\n")
 
 end_time = datetime.datetime.now()
 run_time = end_time - start_time
