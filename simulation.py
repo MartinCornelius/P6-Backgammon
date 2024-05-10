@@ -6,7 +6,7 @@ import heuristics
 import os
 import datetime
 
-def every_dice_simulation(num_simulations, initial_board = None):
+def every_dice_simulation(num_simulations, initial_board = None, player_1_heuristic = heuristics.rand_choice, player_2_heuristic = heuristics.rand_choice):
     dice_pairs = []
     average_winrates = []
     highest_winrates = []
@@ -14,7 +14,7 @@ def every_dice_simulation(num_simulations, initial_board = None):
     for d1 in range(0 + 1, 6 + 1):
         for d2 in range(d1, 6 + 1):
             print(f"Running Monte Carlo with dice: ({d1}, {d2})")
-            curr_wincounts, curr_moves = monte_carlo_simulation(num_simulations, [d1, d2], initial_board)
+            curr_wincounts, curr_moves = monte_carlo_simulation(num_simulations, [d1, d2], initial_board, player_1_heuristic = heuristics.rand_choice, player_2_heuristic = heuristics.rand_choice)
             sum = 0
             biggest = 0
             for i in range(len(curr_wincounts)):
@@ -151,7 +151,7 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None, player_1
                 dice_list = board.roll_dice()
                 do_run = True
                 while len(dice_list) > 0 and do_run:
-                    temp_dice = dice_list.copy() # should delete duplicates
+                    temp_dice = [dice_list[0], dice_list[1]] if dice_list[0] != dice_list[1] else [dice_list[0]]
                     possible_moves = []
                     for d in temp_dice:    
                         legal_moves = board.get_legal_moves(board.current_player, d)
@@ -177,8 +177,6 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None, player_1
 
     return wins, first_moves
 
-start_time = datetime.datetime.now()
-
 num_simulations = 10000
 
 initial_board = {
@@ -189,44 +187,22 @@ initial_board = {
             "current_player": 0
         }
 
-dice_pairs, average_winrates, highest_winrates, best_moves,  = every_dice_simulation(num_simulations)
-
+biggest = 0
 if not os.path.exists("logs"):
     os.mkdir("logs")
-file = open(f"logs/{len(os.listdir('logs')) + 1}.csv", "w")
-file.write("Dice Pair;Average Win%;Highest Win%;Best Move\n")
-for i in range(len(dice_pairs)):
-    file.write(f"{dice_pairs[i]};{average_winrates[i]:.2f};{highest_winrates[i]:.2f};{best_moves[i]}\n")
-
-end_time = datetime.datetime.now()
-run_time = end_time - start_time
-print(f"runtime: {run_time}")
-
-"""
-random_results, opening_moves1 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
-furthest_results, opening_moves2 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
-closest_results, opening_moves3 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
-safe_results, opening_moves4 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.keep_pieces_safe)
-hit_results, opening_moves5 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.hit_enemy_pieces)
-
+folder = f"logs/run{len(os.listdir('logs')) + 1}"
+os.mkdir(folder)
 print(f"num_simulations: {num_simulations}")
 
-biggest = 0
-for i in range(len(random_results)):
-    biggest = i if random_results[i][0] > random_results[biggest][0] else biggest
-print(f"Player 1 highest winrate random moves: {100*(random_results[biggest][0]/num_simulations)}% with move: {opening_moves1[biggest]}")
-for i in range(len(furthest_results)):
-    biggest = i if furthest_results[i][0] > furthest_results[biggest][0] else biggest
-print(f"Player 1 highest winrate furthest moves: {100*(furthest_results[biggest][0]/num_simulations)}% with move: {opening_moves2[biggest]}")
-for i in range(len(closest_results)):
-    biggest = i if closest_results[i][0] > closest_results[biggest][0] else biggest
-print(f"Player 1 highest winrate closest moves: {100*(closest_results[biggest][0]/num_simulations)}% with move: {opening_moves3[biggest]}")
-for i in range(len(safe_results)):
-    biggest = i if safe_results[i][0] > safe_results[biggest][0] else biggest
-print(f"Player 1 highest winrate safe moves: {100*(safe_results[biggest][0]/num_simulations)}% with move: {opening_moves4[biggest]}")
-for i in range(len(hit_results)):
-    biggest = i if hit_results[i][0] > hit_results[biggest][0] else biggest
-print(f"Player 1 highest winrate hit moves: {100*(hit_results[biggest][0]/num_simulations)}% with move: {opening_moves5[biggest]}")
+for heuristic in [heuristics.rand_choice, heuristics.move_furthest_first, heuristics.move_closest_first, heuristics.keep_pieces_safe, heuristics.hit_enemy_pieces]:
+    start_time = datetime.datetime.now()
+    dice_pairs, average_winrates, highest_winrates, best_moves = every_dice_simulation(num_simulations, None, heuristic)
+    file = open(f"{folder}/{heuristic.__name__}.csv", "w")
+    file.write("Dice Pair;Average Win%;Highest Win%;Best Move\n")
+    for i in range(len(dice_pairs)):
+        file.write(f"{dice_pairs[i]};{average_winrates[i]:.2f};{highest_winrates[i]:.2f};{best_moves[i]}\n")
+    print(f"runtime of {heuristic.__name__}: {datetime.datetime.now() - start_time}")
+
 
 # Plotting results
 starting_dice = []
@@ -244,4 +220,3 @@ plt.ylabel('Win Percentage')
 plt.xlabel('Starting Roll')
 plt.ylim(0, 100)
 plt.show()
-"""
