@@ -109,7 +109,7 @@ def get_possible_starting_moves(dice, initial_board):
     
     return boards
 
-def monte_carlo_simulation(num_simulations, dice, initial_board = None, heuristic = heuristics.random):
+def monte_carlo_simulation(num_simulations, dice, initial_board = None, player_1_heuristic = heuristics.rand_choice, player_2_heuristic = heuristics.rand_choice):
     boards = get_possible_starting_moves(dice, initial_board)
     wins = [] # list of player 1 and 2 wins for each opening move
     first_moves = [] # list of src-dst moves to represent opening move
@@ -138,7 +138,10 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None, heuristi
                     if len(possible_moves) == 0:
                         do_run = False
                     else:
-                        move = heuristic(possible_moves, board)
+                        if board.current_player == 0:
+                            move = player_1_heuristic(possible_moves, board)
+                        else:
+                            move = player_2_heuristic(possible_moves, board)
                         board.move_piece(board.current_player, move[0], move[1])
                         dice_list.remove(move[2])
                             
@@ -150,7 +153,7 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None, heuristi
 
     return wins, first_moves
 
-num_simulations = 1000
+num_simulations = 10000
 
 initial_board = {
             "points": [[0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
@@ -160,15 +163,30 @@ initial_board = {
             "current_player": 0
         }
 
-results, opening_moves = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
-print(f"{len(results)} different opening moves")
+random_results, opening_moves1 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
+furthest_results, opening_moves2 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
+closest_results, opening_moves3 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
+safe_results, opening_moves4 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.keep_pieces_safe)
+hit_results, opening_moves5 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.hit_enemy_pieces)
+
+print(f"num_simulations: {num_simulations}")
+
 biggest = 0
-lowest = 0
-for i in range(len(results)):
-    biggest = i if results[i][0] > results[biggest][0] else biggest
-    lowest = i if results[i][0] < results[lowest][0] else lowest
-print(f"Player 1 highest winrate: {100*(results[biggest][0]/num_simulations)}% with move: {opening_moves[biggest]}")
-print(f"Player 1 lowest winrate: {100*(results[lowest][0]/num_simulations)}% with move: {opening_moves[lowest]}")
+for i in range(len(random_results)):
+    biggest = i if random_results[i][0] > random_results[biggest][0] else biggest
+print(f"Player 1 highest winrate random moves: {100*(random_results[biggest][0]/num_simulations)}% with move: {opening_moves1[biggest]}")
+for i in range(len(furthest_results)):
+    biggest = i if furthest_results[i][0] > furthest_results[biggest][0] else biggest
+print(f"Player 1 highest winrate furthest moves: {100*(furthest_results[biggest][0]/num_simulations)}% with move: {opening_moves2[biggest]}")
+for i in range(len(closest_results)):
+    biggest = i if closest_results[i][0] > closest_results[biggest][0] else biggest
+print(f"Player 1 highest winrate closest moves: {100*(closest_results[biggest][0]/num_simulations)}% with move: {opening_moves3[biggest]}")
+for i in range(len(safe_results)):
+    biggest = i if safe_results[i][0] > safe_results[biggest][0] else biggest
+print(f"Player 1 highest winrate safe moves: {100*(safe_results[biggest][0]/num_simulations)}% with move: {opening_moves4[biggest]}")
+for i in range(len(hit_results)):
+    biggest = i if hit_results[i][0] > hit_results[biggest][0] else biggest
+print(f"Player 1 highest winrate hit moves: {100*(hit_results[biggest][0]/num_simulations)}% with move: {opening_moves5[biggest]}")
 
 # Plotting results
 moves = []
