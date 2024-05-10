@@ -125,23 +125,23 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None, heuristi
             
             while not board.is_game_over():
                 dice_list = board.roll_dice()
-                blocked_dice_list = []
-                for _ in dice_list:
-                    blocked_dice_list.append(False)
-                while len(dice_list) > 0 and False in blocked_dice_list:
-                    for i, d in enumerate(dice_list):    
+                do_run = True
+                while len(dice_list) > 0 and do_run:
+                    temp_dice = dice_list.copy() # should delete duplicates
+                    possible_moves = []
+                    for d in temp_dice:    
                         legal_moves = board.get_legal_moves(board.current_player, d)
 
-                        if not legal_moves:
-                            blocked_dice_list[i] = True
-                        else:
-                            move = heuristic(legal_moves)
-                            board.move_piece(board.current_player, move[0], move[1])
-
-                            dice_list.remove(d)
-                            blocked_dice_list = []
-                            for _ in dice_list:
-                                blocked_dice_list.append(False)
+                        for move in legal_moves:
+                            possible_moves.append([move[0], move[1], d])
+                    
+                    if len(possible_moves) == 0:
+                        do_run = False
+                    else:
+                        move = heuristic(possible_moves, board)
+                        board.move_piece(board.current_player, move[0], move[1])
+                        dice_list.remove(move[2])
+                            
 
                 board.current_player = 1 - board.current_player
 
