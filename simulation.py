@@ -4,6 +4,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from board import Board
 import os
+import datetime
 
 def every_dice_simulation(num_simulations, initial_board = None):
     dice_pairs = []
@@ -173,6 +174,8 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None):
 
     return wins, first_moves
 
+start_time = datetime.datetime.now()
+
 num_simulations = 1000
 
 initial_board = {
@@ -189,6 +192,10 @@ df = pd.DataFrame({'Dice Pair': dice_pairs, 'Average Win%': average_winrates, 'H
 if not os.path.exists("logs"):
     os.mkdir("logs")
 df.to_csv(f"logs/{len(os.listdir('logs')) + 1 }.csv")
+
+end_time = datetime.datetime.now()
+run_time = end_time - start_time
+print(f"runtime: {run_time}")
 
 """
 # Plotting results
