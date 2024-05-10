@@ -151,7 +151,10 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None, player_1
                 dice_list = board.roll_dice()
                 do_run = True
                 while len(dice_list) > 0 and do_run:
-                    temp_dice = [dice_list[0], dice_list[1]] if dice_list[0] != dice_list[1] else [dice_list[0]]
+                    if len(dice_list) > 1:
+                        temp_dice = [dice_list[0], dice_list[1]] if dice_list[0] != dice_list[1] else [dice_list[0]]
+                    else:
+                        temp_dice = dice_list
                     possible_moves = []
                     for d in temp_dice:    
                         legal_moves = board.get_legal_moves(board.current_player, d)
@@ -190,7 +193,7 @@ initial_board = {
 biggest = 0
 if not os.path.exists("logs"):
     os.mkdir("logs")
-folder = f"logs/run{len(os.listdir('logs')) + 1}"
+folder = f"logs/run{len(os.listdir('logs')) + 1}-sims{num_simulations}"
 os.mkdir(folder)
 print(f"num_simulations: {num_simulations}")
 
