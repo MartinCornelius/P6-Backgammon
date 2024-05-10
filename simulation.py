@@ -176,7 +176,7 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None):
 
 start_time = datetime.datetime.now()
 
-num_simulations = 1000
+num_simulations = 10000
 
 initial_board = {
             "points": [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -190,7 +190,7 @@ dice_pairs, average_winrates, highest_winrates, best_moves,  = every_dice_simula
 
 if not os.path.exists("logs"):
     os.mkdir("logs")
-file = open(f"logs/{len(os.listdir('logs')) + 1}.txt", "w")
+file = open(f"logs/{len(os.listdir('logs')) + 1}.csv", "w")
 file.write("Dice Pair;Average Win%;Highest Win%;Best Move\n")
 for i in range(len(dice_pairs)):
     file.write(f"{dice_pairs[i]};{average_winrates[i]:.2f};{highest_winrates[i]:.2f};{best_moves[i]}\n")
