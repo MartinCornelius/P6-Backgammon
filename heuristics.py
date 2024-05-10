@@ -21,3 +21,8 @@ def move_closest_first(possible_moves, current_board):
 			closest_move = move if closest_move[0] < move[0] else closest_move
 	return closest_move
 
+def keep_pieces_safe():
+	pass
+
+def hit_enemy_pieces():
+	pass
