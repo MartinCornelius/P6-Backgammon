@@ -3,22 +3,29 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from board import Board
+import os
 
 def every_dice_simulation(num_simulations, initial_board = None):
+    dice_pairs = []
+    average_winrates = []
     highest_winrates = []
     best_moves = []
-    dice_pairs = []
     for d1 in range(0 + 1, 6 + 1):
         for d2 in range(d1, 6 + 1):
             print(f"Running Monte Carlo with dice: ({d1}, {d2})")
-            curr_winrates, curr_moves = monte_carlo_simulation(num_simulations, [d1, d2], initial_board)
+            curr_wincounts, curr_moves = monte_carlo_simulation(num_simulations, [d1, d2], initial_board)
+            sum = 0
             biggest = 0
-            for i in range(len(curr_winrates)):
-                biggest = i if curr_winrates[biggest][0] < curr_winrates[i][0] else biggest
-            highest_winrates.append(curr_winrates[biggest])
+            for i in range(len(curr_wincounts)):
+                sum += curr_wincounts[i][0]
+                if curr_wincounts[i][0] > curr_wincounts[biggest][0]:
+                    biggest = i
+            dice_pairs.append([d1, d2])
+            average_winrates.append(100 * (sum / len(curr_wincounts)) / num_simulations)
+            highest_winrates.append(100 * curr_wincounts[biggest][0] / num_simulations)
             best_moves.append(curr_moves[biggest])
-            dice_pairs.append([d1,d2])
-    return highest_winrates, best_moves, dice_pairs
+
+    return dice_pairs, average_winrates, highest_winrates, best_moves
 
 def is_duplicate(board, b):
     if board.current_player != b.current_player:
@@ -176,17 +183,14 @@ initial_board = {
             "current_player": 0
         }
 
-results, opening_moves, dice_pairs = every_dice_simulation(num_simulations)
-print(f"{len(results)} different rolls")
+dice_pairs, average_winrates, highest_winrates, best_moves,  = every_dice_simulation(num_simulations)
+
+df = pd.DataFrame({'Dice Pair': dice_pairs, 'Average Win%': average_winrates, 'Highest Win%': highest_winrates, 'Best Move': best_moves})
+if not os.path.exists("logs"):
+    os.mkdir("logs")
+df.to_csv(f"logs/{len(os.listdir('logs')) + 1 }.csv")
 
 """
-results, opening_moves = monte_carlo_simulation(num_simulations, [3, 4])
-biggest = 0
-for i in range(len(results)):
-    biggest = i if results[i][0] > results[biggest][0] else biggest
-print(f"Player 1 highest winrate: {100*(results[biggest][0]/num_simulations)}% with move: {opening_moves[biggest]}")
-"""
-
 # Plotting results
 starting_dice = []
 percent_wins = []
@@ -203,3 +207,4 @@ plt.ylabel('Win Percentage')
 plt.xlabel('Starting Roll')
 plt.ylim(0, 100)
 plt.show()
+"""
