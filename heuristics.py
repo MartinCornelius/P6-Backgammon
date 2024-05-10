@@ -51,20 +51,24 @@ def bear_off_first(possible_moves, current_board):
 	pass
 
 def dan_heuristic(possible_moves, current_board):
-	furthest_move = None
 	unchanged_move = None
+	furthest_move = None
 	#Check if hit move is possible.
 	if current_board.current_player == 0:
 		for move in possible_moves:
 			if current_board.points[1 - current_board.current_player][move[1]] == 1:
-				if furthest_move[0] < move[0]:
+				if furthest_move == None:
+					furthest_move = move
+				elif furthest_move[0] < move[0]:
 					furthest_move = move
 				elif furthest_move[0] == move[0] and furthest_move[2] < move[2]:
 					furthest_move = move
 	else:
 		for move in possible_moves:
 			if current_board.points[1 - current_board.current_player][move[1]] == 1:
-				if furthest_move[0] > move[0]:
+				if furthest_move == None:
+					furthest_move = move
+				elif furthest_move[0] > move[0]:
 					furthest_move = move
 				elif furthest_move[0] == move[0] and furthest_move[2] < move[2]:
 					furthest_move = move
@@ -74,7 +78,9 @@ def dan_heuristic(possible_moves, current_board):
 			#Check if safe move is possible.
 			for move in possible_moves:
 				if current_board.points[current_board.current_player][move[1]] > 0:
-					if furthest_move[0] < move[0]:
+					if furthest_move == None:
+						furthest_move = move
+					elif furthest_move[0] < move[0]:
 						furthest_move = move
 					elif furthest_move[0] == move[0] and furthest_move[2] < move[2]:
 						furthest_move = move
@@ -83,6 +89,8 @@ def dan_heuristic(possible_moves, current_board):
 			#Check if safe move is possible.
 			for move in possible_moves:
 				if current_board.points[current_board.current_player][move[1]] > 0:
+					if furthest_move == None:
+						furthest_move = move
 					if furthest_move[0] > move[0]:
 						furthest_move = move
 					elif furthest_move[0] == move[0] and furthest_move[2] < move[2]:
@@ -93,13 +101,17 @@ def dan_heuristic(possible_moves, current_board):
 		furthest_move = possible_moves[0]
 		if current_board.current_player == 0:
 			for move in possible_moves:
-				if furthest_move[0] < move[0]:
+				if furthest_move == None:
+					furthest_move = move
+				elif furthest_move[0] < move[0]:
 					furthest_move = move
 				elif furthest_move[0] == move[0] and furthest_move[2] < move[2]:
 					furthest_move = move
 		else:
 			for move in possible_moves:
-				if furthest_move[0] > move[0]:
+				if furthest_move == None:
+					furthest_move = move
+				elif furthest_move[0] > move[0]:
 					furthest_move = move
 				elif furthest_move[0] == move[0] and furthest_move[2] < move[2]:
 					furthest_move = move
