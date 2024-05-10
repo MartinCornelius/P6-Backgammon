@@ -3,6 +3,30 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from board import Board
 import heuristics
+import os
+import datetime
+
+def every_dice_simulation(num_simulations, initial_board = None):
+    dice_pairs = []
+    average_winrates = []
+    highest_winrates = []
+    best_moves = []
+    for d1 in range(0 + 1, 6 + 1):
+        for d2 in range(d1, 6 + 1):
+            print(f"Running Monte Carlo with dice: ({d1}, {d2})")
+            curr_wincounts, curr_moves = monte_carlo_simulation(num_simulations, [d1, d2], initial_board)
+            sum = 0
+            biggest = 0
+            for i in range(len(curr_wincounts)):
+                sum += curr_wincounts[i][0]
+                if curr_wincounts[i][0] > curr_wincounts[biggest][0]:
+                    biggest = i
+            dice_pairs.append([d1, d2])
+            average_winrates.append(100 * (sum / len(curr_wincounts)) / num_simulations)
+            highest_winrates.append(100 * curr_wincounts[biggest][0] / num_simulations)
+            best_moves.append(curr_moves[biggest])
+
+    return dice_pairs, average_winrates, highest_winrates, best_moves
 
 def is_duplicate(board, b):
     if board.current_player != b.current_player:
@@ -153,16 +177,32 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None, player_1
 
     return wins, first_moves
 
+start_time = datetime.datetime.now()
+
 num_simulations = 10000
 
 initial_board = {
-            "points": [[0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],
+            "points": [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
             "bar": [0, 1],
-            "borne_off": [0, 14],
+            "borne_off": [13, 14],
             "current_player": 0
         }
 
+dice_pairs, average_winrates, highest_winrates, best_moves,  = every_dice_simulation(num_simulations)
+
+if not os.path.exists("logs"):
+    os.mkdir("logs")
+file = open(f"logs/{len(os.listdir('logs')) + 1}.csv", "w")
+file.write("Dice Pair;Average Win%;Highest Win%;Best Move\n")
+for i in range(len(dice_pairs)):
+    file.write(f"{dice_pairs[i]};{average_winrates[i]:.2f};{highest_winrates[i]:.2f};{best_moves[i]}\n")
+
+end_time = datetime.datetime.now()
+run_time = end_time - start_time
+print(f"runtime: {run_time}")
+
+"""
 random_results, opening_moves1 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
 furthest_results, opening_moves2 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
 closest_results, opening_moves3 = monte_carlo_simulation(num_simulations, [3, 4], None, heuristics.move_furthest_first)
@@ -189,18 +229,19 @@ for i in range(len(hit_results)):
 print(f"Player 1 highest winrate hit moves: {100*(hit_results[biggest][0]/num_simulations)}% with move: {opening_moves5[biggest]}")
 
 # Plotting results
-moves = []
+starting_dice = []
 percent_wins = []
 colors = []
 for i in range(len(results)):
-    moves.append(f"Move {i+1}")
+    starting_dice.append(f"[{dice_pairs[i][0]}, {dice_pairs[i][1]}]")
     percent_wins.append(results[i][0] / num_simulations * 100)
     colors.append("magenta")
 
-df = pd.DataFrame({'Move': moves, 'Win Percentage': percent_wins})
-df.plot(kind='bar', x='Move', y='Win Percentage', color=colors)
-plt.title('Win Percentage by Opening Move')
+df = pd.DataFrame({'Starting Roll': starting_dice, 'Win Percentage': percent_wins})
+df.plot(kind='bar', x='Starting Roll', y='Win Percentage', color=colors)
+plt.title('Highest Win Percentage by Starting Roll')
 plt.ylabel('Win Percentage')
-plt.xlabel('Opening Move')
+plt.xlabel('Starting Roll')
 plt.ylim(0, 100)
 plt.show()
+"""
