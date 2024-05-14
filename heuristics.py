@@ -43,7 +43,7 @@ def keep_pieces_safe(possible_moves, current_board):
 
 def hit_enemy_pieces(possible_moves, current_board):
 	for move in possible_moves:
-		if current_board.points[1 - current_board.current_player][move[1]] == 1:
+		if move[1] >= 0 and move[1] <= 23 and current_board.points[1 - current_board.current_player][move[1]] == 1:
 			return move
 	return rand_choice(possible_moves, None)
 
