@@ -18,7 +18,7 @@ def every_dice_simulation(num_simulations, initial_board = None, player_1_heuris
     for d1 in range(0 + 1, 6 + 1):
         for d2 in range(d1, 6 + 1):
             print(f"Running Monte Carlo with dice: ({d1}, {d2})")
-            curr_wincounts, curr_moves, curr_borne_off, curr_hits = monte_carlo_simulation(num_simulations, [d1, d2], initial_board, player_1_heuristic = heuristics.rand_choice, player_2_heuristic = heuristics.rand_choice)
+            curr_wincounts, curr_moves, curr_borne_off, curr_hits = monte_carlo_simulation(num_simulations, [d1, d2], initial_board, player_1_heuristic, player_2_heuristic)
             win_sum = 0
             win_biggest = 0
             borne_off_sum = 0
@@ -39,10 +39,8 @@ def every_dice_simulation(num_simulations, initial_board = None, player_1_heuris
             highest_winrates.append(100 * curr_wincounts[win_biggest][0] / num_simulations)
             best_moves.append(curr_moves[win_biggest])
             average_borne_offs.append((borne_off_sum / len(curr_borne_off)) / num_simulations)
-            # average_hits.append((hits_sum / len(curr_hits)) / num_simulations)
-            # average_opponent_hits.append((opponent_hits_sum / len(curr_hits)) / num_simulations)
-            average_hits.append(hits_sum)
-            average_opponent_hits.append(opponent_hits_sum)
+            average_hits.append((hits_sum / len(curr_hits)) / num_simulations)
+            average_opponent_hits.append((opponent_hits_sum / len(curr_hits)) / num_simulations)
             highest_hits.append(curr_hits[hits_biggest])
 
     return dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits
@@ -190,16 +188,16 @@ def monte_carlo_simulation(num_simulations, dice, initial_board = None, player_1
                     else:
                         if board.current_player == 0:
                             move = player_1_heuristic(possible_moves, board)
-                            if move[1] >= 0 and move[1] <= 23 and board.points[1][move[1]] == 1:
-                                total_hits[index][0] += 1
                         else:
                             move = player_2_heuristic(possible_moves, board)
-                            if move[1] >= 0 or move[1] <= 23 and board.points[0][move[1]] == 1:
-                                total_hits[index][1] += 1
+                        prev_bar = board.bar.copy()
                         board.move_piece(board.current_player, move[0], move[1])
+                        if prev_bar[0] < board.bar[0]:
+                            total_hits[index][1] += 1
+                        elif prev_bar[1] < board.bar[1]:
+                            total_hits[index][0] += 1
                         dice_list.remove(move[2])
-                            
-
+                        
                 board.current_player = 0 if board.current_player == 1 else 1
 
             winner = 0 if board.borne_off[0] == 15 else 1
@@ -228,9 +226,10 @@ folder = f"logs/run{len(os.listdir('logs')) + 1}-sims{num_simulations}"
 os.mkdir(folder)
 print(f"num_simulations: {num_simulations}")
 
-for heuristic in [heuristics.rand_choice, heuristics.move_furthest_first, heuristics.move_closest_first, heuristics.keep_pieces_safe, heuristics.hit_enemy_pieces]:
+heuristic_list = [heuristics.rand_choice, heuristics.move_furthest_first, heuristics.move_closest_first, heuristics.keep_pieces_safe, heuristics.hit_enemy_pieces]
+for heuristic in heuristic_list:
     start_time = datetime.datetime.now()
-    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, None, player_1_heuristic=heuristic, player_2_heuristic=heuristics.rand_choice)
+    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, None, heuristic, heuristics.rand_choice)
     file = open(f"{folder}/{heuristic.__name__}.csv", "w")
     file.write("Dice Pair;Average Win%;Highest Win%;Best Move;Average Pieces Borne Off;Average Hits Made;Average Opponent Hits;Highest Amount Hits\n")
     for i in range(len(dice_pairs)):
