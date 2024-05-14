@@ -1,6 +1,3 @@
-"""import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt"""
 from board import Board
 import heuristics
 import os
@@ -237,22 +234,3 @@ for heuristic in heuristic_list:
     print(f"runtime of {heuristic.__name__}: {datetime.datetime.now() - start_time}")
 
 print(f"total runtime of program: {datetime.datetime.now() - program_start_time}")
-
-"""
-# Plotting results
-starting_dice = []
-percent_wins = []
-colors = []
-for i in range(len(results)):
-    starting_dice.append(f"[{dice_pairs[i][0]}, {dice_pairs[i][1]}]")
-    percent_wins.append(results[i][0] / num_simulations * 100)
-    colors.append("magenta")
-
-df = pd.DataFrame({'Starting Roll': starting_dice, 'Win Percentage': percent_wins})
-df.plot(kind='bar', x='Starting Roll', y='Win Percentage', color=colors)
-plt.title('Highest Win Percentage by Starting Roll')
-plt.ylabel('Win Percentage')
-plt.xlabel('Starting Roll')
-plt.ylim(0, 100)
-plt.show()
-"""
