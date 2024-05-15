@@ -37,7 +37,7 @@ def move_closest_first(possible_moves, current_board):
 
 def keep_pieces_safe(possible_moves, current_board):
 	for move in possible_moves:
-		if current_board.points[current_board.current_player][move[1]] > 0:
+		if move[1] >= 0 and move[1] <= 23 and current_board.points[current_board.current_player][move[1]] > 0:
 			return move
 	return rand_choice(possible_moves, None)
 
