@@ -224,14 +224,14 @@ running_game_board = {
 biggest = 0
 if not os.path.exists("logs"):
     os.mkdir("logs")
-folder = f"logs/run{len(os.listdir('logs')) + 1}-sims{num_simulations}"
+folder = f"logs/running-furthest-sims{num_simulations}"
 os.mkdir(folder)
 print(f"num_simulations: {num_simulations}")
 
 heuristic_list = [heuristics.rand_choice, heuristics.move_furthest_first, heuristics.move_closest_first]
 for heuristic in heuristic_list:
     start_time = datetime.datetime.now()
-    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, None, heuristic, heuristics.move_furthest_first)
+    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, running_game_board, heuristic, heuristics.move_furthest_first)
     file = open(f"{folder}/{heuristic.__name__}.csv", "w")
     file.write("Dice Pair;Average Win%;Highest Win%;Best Move;Average Pieces Borne Off;Average Hits Made;Average Opponent Hits;Highest Amount Hits\n")
     for i in range(len(dice_pairs)):
