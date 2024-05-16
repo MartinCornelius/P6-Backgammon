@@ -224,7 +224,7 @@ running_game_board = {
 biggest = 0
 if not os.path.exists("logs"):
     os.mkdir("logs")
-folder = f"logs/run{len(os.listdir('logs')) + 1}-sims{num_simulations}"
+folder = f"logs/running-random-sims{num_simulations}"
 os.mkdir(folder)
 print(f"num_simulations: {num_simulations}")
 
