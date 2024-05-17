@@ -53,7 +53,21 @@ def hit_enemy_pieces(possible_moves, current_board):
 	return rand_choice(possible_moves, None)
 
 def bear_off_first(possible_moves, current_board):
-	pass
+	if current_board.current_player == 0:
+		for move in possible_moves:
+			if move[1] < 0:
+				return move
+	else:
+		for move in possible_moves:
+			if move[1] > 23:
+				return move
+	return rand_choice(possible_moves, current_board)
+
+def near_edge_first(possible_moves, current_board):
+	for move in possible_moves:
+		if move[1] >= 0 and move[1] <=23:
+			return move
+	return rand_choice(possible_moves, current_board)
 
 def dan_heuristic(possible_moves, current_board):
 	unchanged_move = None
