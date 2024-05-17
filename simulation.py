@@ -213,25 +213,25 @@ program_start_time = datetime.datetime.now()
 
 num_simulations = 10000
 
-initial_board = {
-            "points": [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-            "bar": [0, 1],
-            "borne_off": [13, 14],
+even_home_board = {
+            "points": [[2, 2, 3, 4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 4, 3, 2, 2]],
+            "bar": [0, 0],
+            "borne_off": [0, 0],
             "current_player": 0
         }
 
 biggest = 0
 if not os.path.exists("logs"):
     os.mkdir("logs")
-folder = f"logs/run{len(os.listdir('logs')) + 1}-sims{num_simulations}"
+folder = f"logs/even-home-random-sims{num_simulations}"
 os.mkdir(folder)
 print(f"num_simulations: {num_simulations}")
 
-heuristic_list = [heuristics.rand_choice, heuristics.move_furthest_first, heuristics.move_closest_first, heuristics.keep_pieces_safe, heuristics.hit_enemy_pieces]
+heuristic_list = [heuristics.rand_choice, heuristics.bear_off_first, heuristics.near_edge_first]
 for heuristic in heuristic_list:
     start_time = datetime.datetime.now()
-    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, None, heuristic, heuristics.rand_choice)
+    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, even_home_board, heuristic, heuristics.rand_choice)
     file = open(f"{folder}/{heuristic.__name__}.csv", "w")
     file.write("Dice Pair;Average Win%;Highest Win%;Best Move;Average Pieces Borne Off;Average Hits Made;Average Opponent Hits;Highest Amount Hits\n")
     for i in range(len(dice_pairs)):
