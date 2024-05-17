@@ -213,7 +213,7 @@ program_start_time = datetime.datetime.now()
 
 num_simulations = 10000
 
-far_home_board = {
+near_home_board = {
             "points": [[5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5]],
             "bar": [0, 0],
@@ -231,7 +231,7 @@ print(f"num_simulations: {num_simulations}")
 heuristic_list = [heuristics.rand_choice, heuristics.bear_off_first, heuristics.near_edge_first]
 for heuristic in heuristic_list:
     start_time = datetime.datetime.now()
-    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, None, heuristic, heuristics.rand_choice)
+    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, near_home_board, heuristic, heuristics.rand_choice)
     file = open(f"{folder}/{heuristic.__name__}.csv", "w")
     file.write("Dice Pair;Average Win%;Highest Win%;Best Move;Average Pieces Borne Off;Average Hits Made;Average Opponent Hits;Highest Amount Hits\n")
     for i in range(len(dice_pairs)):
