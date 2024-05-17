@@ -224,11 +224,11 @@ far_home_board = {
 biggest = 0
 if not os.path.exists("logs"):
     os.mkdir("logs")
-folder = f"logs/far-home-furthest-sims{num_simulations}"
+folder = f"logs/far-home-bearoff-sims{num_simulations}"
 os.mkdir(folder)
 print(f"num_simulations: {num_simulations}")
 
-heuristic_list = [heuristics.rand_choice, heuristics.move_furthest_first, heuristics.move_closest_first]
+heuristic_list = [heuristics.rand_choice, heuristics.bear_off_first, heuristics.near_edge_first]
 for heuristic in heuristic_list:
     start_time = datetime.datetime.now()
     dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, far_home_board, heuristic, heuristics.bear_off_first)
