@@ -213,11 +213,35 @@ program_start_time = datetime.datetime.now()
 
 num_simulations = 10000
 
-initial_board = {
-            "points": [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-            "bar": [0, 1],
-            "borne_off": [13, 14],
+running_game_board = {
+            "points": [[0, 0, 0, 0, 0, 5, 2, 3, 2, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 2, 3, 2, 5, 0, 0, 0, 0, 0]],
+            "bar": [0, 0],
+            "borne_off": [0, 0],
+            "current_player": 0
+        }
+
+far_home_board = {
+            "points": [[0, 0, 0, 5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5, 0, 0, 0]],
+            "bar": [0, 0],
+            "borne_off": [0, 0],
+            "current_player": 0
+        }
+
+near_home_board = {
+            "points": [[5, 5, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 5, 5]],
+            "bar": [0, 0],
+            "borne_off": [0, 0],
+            "current_player": 0
+        }
+
+even_home_board = {
+            "points": [[2, 2, 3, 4, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 4, 3, 2, 2]],
+            "bar": [0, 0],
+            "borne_off": [0, 0],
             "current_player": 0
         }
 
@@ -228,6 +252,7 @@ folder = f"logs/run{len(os.listdir('logs')) + 1}-sims{num_simulations}"
 os.mkdir(folder)
 print(f"num_simulations: {num_simulations}")
 
+"""
 heuristic_list = [heuristics.rand_choice, heuristics.move_furthest_first, heuristics.move_closest_first, heuristics.keep_pieces_safe, heuristics.hit_enemy_pieces]
 for heuristic in heuristic_list:
     start_time = datetime.datetime.now()
@@ -237,5 +262,34 @@ for heuristic in heuristic_list:
     for i in range(len(dice_pairs)):
         file.write(f"{dice_pairs[i]};{average_winrates[i]:.2f};{highest_winrates[i]:.2f};{best_moves[i]};{average_borne_offs[i]:.2f};{average_hits[i]:.2f};{average_opponent_hits[i]:.2f};{highest_hits[i]}\n")
     print(f"runtime of {heuristic.__name__}: {datetime.datetime.now() - start_time}")
+"""
+
+curr_wincounts, curr_moves, curr_borne_off, curr_hits, highest_hit = monte_carlo_simulation(num_simulations, [2, 2], None, heuristics.rand_choice, heuristics.rand_choice)
+
+win_sum = 0
+win_biggest = 0
+borne_off_sum = 0
+hits_sum = 0
+opponent_hits_sum = 0
+hits_biggest = 0
+for i in range(len(curr_wincounts)):
+    win_sum += curr_wincounts[i][0]
+    borne_off_sum += curr_borne_off[i][0]
+    hits_sum += curr_hits[i][0]
+    opponent_hits_sum += curr_hits[i][1]
+    if curr_wincounts[i][0] > curr_wincounts[win_biggest][0]:
+        win_biggest = i
+    if highest_hit[i] > highest_hit[hits_biggest]:
+        hits_biggest = i
+
+average_winrates = 100 * (win_sum / len(curr_wincounts)) / num_simulations
+highest_winrates = 100 * curr_wincounts[win_biggest][0] / num_simulations
+best_move = curr_moves[win_biggest]
+average_borne_offs = (borne_off_sum / len(curr_borne_off)) / num_simulations
+average_hits = (hits_sum / len(curr_hits)) / num_simulations
+average_opponent_hits = (opponent_hits_sum / len(curr_hits)) / num_simulations
+highest_hits = highest_hit[hits_biggest]
+
+print(f"{average_winrates}, {highest_winrates}, {best_move}, {average_borne_offs}, {average_hits}, {average_opponent_hits}, {highest_hits}")
 
 print(f"total runtime of program: {datetime.datetime.now() - program_start_time}")
