@@ -136,4 +136,24 @@ def dan_heuristic(possible_moves, current_board):
 					furthest_move = move
 
 	return furthest_move
+"""
+#Check if there is any pieces that can hit each other on the board.
+def pre_running_game_check(current_board):
+	for tile in current_board.points
+		if
+			return False
+	return True
 
+def first_strat(possible_moves, current_board):
+	#Hit
+	if (current_board.bar[0] == 0) & (current_board.bar[0] == 1) & (current_board.borne_off[0] == 0) & (current_board.borne_off[1] == 0) & pre_running_game_check(current_board): 
+		if current_board.current_player == 0:
+			for move in possible_moves:
+				if move[1] >= 0 and move[1] <= 23 and current_board.points[1][move[1]] == 1:
+					return move
+		else:
+			for move in possible_moves:
+				if move[1] >= 0 and move[1] <= 23 and current_board.points[0][move[1]] == 1:
+					return move
+		return move_furthest_first(possible_moves, current_board)
+"""
