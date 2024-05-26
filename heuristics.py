@@ -150,9 +150,9 @@ def pre_running_game_check(current_board):
 def home_game_check(current_board):
 	if current_board.bar[0] != 0 or current_board.bar[1] != 0:
 		return False
-	if current_board.current_player[0] and current_board.points[0][6:23] > 0: #Virker det her?
+	if current_board.current_player == 0 and sum(current_board.points[0][6:23]) > 0:
 		return False
-	if current_board.current_player[1] and current_board.points[1][0:17] > 0: #Virker det her?
+	if current_board.current_player == 1 and sum(current_board.points[1][0:17]) > 0:
 		return False
 	return True
 	
