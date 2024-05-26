@@ -143,16 +143,16 @@ def pre_running_game_check(current_board):
 		return False
 	for tiles in current_board.points[0]:
 		for opp_tiles in current_board.points[1]:
-			if (tiles > 0) & (current_board.points[1].index(next(opp_tiles)) < current_board.points[0].index(tiles)) & (opp_tiles > 0):
+			if tiles > 0 & (current_board.points[1].index(opp_tiles) < current_board.points[0].index(tiles)) & opp_tiles > 0:
 				return False
 	return True
 
 def home_game_check(current_board):
 	if current_board.bar[0] != 0 or current_board.bar[1] != 0:
 		return False
-	if current_board.player[0] and current_board.points[0][6:23] > 0: #Virker det her?
+	if current_board.current_player[0] and current_board.points[0][6:23] > 0: #Virker det her?
 		return False
-	if current_board.player[1] and current_board.points[1][0:17] > 0: #Virker det her?
+	if current_board.current_player[1] and current_board.points[1][0:17] > 0: #Virker det her?
 		return False
 	return True
 	
