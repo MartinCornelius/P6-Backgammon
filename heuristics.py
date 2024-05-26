@@ -136,17 +136,31 @@ def dan_heuristic(possible_moves, current_board):
 					furthest_move = move
 
 	return furthest_move
-"""
-#Check if there is any pieces that can hit each other on the board.
+
+#Check if there is any pieces that can hit each other on the board. ---Lucas tjek den her, jeg er meget usikker på den.
 def pre_running_game_check(current_board):
-	for tile in current_board.points
-		if
-			return False
+	if current_board.bar[0] != 0 or current_board.bar[1] != 0 or current_board.borne_off[0] != 0 or current_board.borne_off[1] != 0:
+		return False
+	for tiles in current_board.points[0]:
+		for opp_tiles in current_board.points[1]:
+			if (tiles > 0) & (current_board.points[1].index(next(opp_tiles)) < current_board.points[0].index(tiles)) & (opp_tiles > 0):
+				return False
 	return True
+
+def home_game_check(current_board):
+	if current_board.bar[0] != 0 or current_board.bar[1] != 0:
+		return False
+	if current_board.player[0] and current_board.points[0][6:23] > 0: #Virker det her?
+		return False
+	if current_board.player[1] and current_board.points[1][0:17] > 0: #Virker det her?
+		return False
+	return True
+	
+
 
 def first_strat(possible_moves, current_board):
 	#Hit
-	if (current_board.bar[0] == 0) & (current_board.bar[0] == 1) & (current_board.borne_off[0] == 0) & (current_board.borne_off[1] == 0) & pre_running_game_check(current_board): 
+	if pre_running_game_check(current_board): 
 		if current_board.current_player == 0:
 			for move in possible_moves:
 				if move[1] >= 0 and move[1] <= 23 and current_board.points[1][move[1]] == 1:
@@ -155,5 +169,11 @@ def first_strat(possible_moves, current_board):
 			for move in possible_moves:
 				if move[1] >= 0 and move[1] <= 23 and current_board.points[0][move[1]] == 1:
 					return move
+		#move furthest
 		return move_furthest_first(possible_moves, current_board)
-"""
+	
+	elif home_game_check(current_board) == False:
+		return move_furthest_first(possible_moves, current_board)
+	
+	else:
+		return bear_off_first(possible_moves, current_board)
