@@ -213,29 +213,65 @@ program_start_time = datetime.datetime.now()
 
 num_simulations = 10000
 
-initial_board = {
-            "points": [[0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
-            "bar": [0, 1],
-            "borne_off": [13, 14],
+running_game_board = {
+            "points": [[0, 0, 0, 0, 0, 5, 2, 3, 2, 1, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                       [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1, 2, 3, 2, 5, 0, 0, 0, 0, 0]],
+            "bar": [0, 0],
+            "borne_off": [0, 0],
             "current_player": 0
         }
 
 biggest = 0
 if not os.path.exists("logs"):
     os.mkdir("logs")
-folder = f"logs/run{len(os.listdir('logs')) + 1}-sims{num_simulations}"
-os.mkdir(folder)
+folder = f"logs/Dan2"
+#os.mkdir(folder)
 print(f"num_simulations: {num_simulations}")
 
-heuristic_list = [heuristics.rand_choice, heuristics.move_furthest_first, heuristics.move_closest_first, heuristics.keep_pieces_safe, heuristics.hit_enemy_pieces]
-for heuristic in heuristic_list:
+boards_list = [None, running_game_board]
+first_strats = [heuristics.move_furthest_first, heuristics.first_strat]
+second_strats = [heuristics.first_strat, heuristics.second_strat]
+c_board = running_game_board
+for c_board in boards_list:
+    for strat_1 in first_strats:
+        for strat_2 in second_strats:
+            start_time = datetime.datetime.now()
+            dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, c_board, strat_1, strat_2)
+            if c_board == None:
+                file = open(f"{folder}/init_{strat_1.__name__}_vs_{strat_2.__name__}.csv", "w")
+            else:
+                file = open(f"{folder}/running_{strat_1.__name__}_vs_{strat_2.__name__}.csv", "w")
+            file.write("Dice Pair;Average Win%;Highest Win%;Best Move;Average Pieces Borne Off;Average Hits Made;Average Opponent Hits;Highest Amount Hits\n")
+            for i in range(len(dice_pairs)):
+                file.write(f"{dice_pairs[i]};{average_winrates[i]:.2f};{highest_winrates[i]:.2f};{best_moves[i]};{average_borne_offs[i]:.2f};{average_hits[i]:.2f};{average_opponent_hits[i]:.2f};{highest_hits[i]}\n")
+            print(f"runtime of {strat_1.__name__}: {datetime.datetime.now() - start_time}")
+
+for c_board in boards_list:
     start_time = datetime.datetime.now()
-    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, None, heuristic, heuristics.rand_choice)
-    file = open(f"{folder}/{heuristic.__name__}.csv", "w")
+    dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, c_board, heuristics.move_furthest_first, heuristics.move_furthest_first)
+    if c_board == None:
+        file = open(f"{folder}/init_furthest_vs_furthest.csv", "w")
+    else:
+        file = open(f"{folder}/running_furthest_vs_furthest.csv", "w")
     file.write("Dice Pair;Average Win%;Highest Win%;Best Move;Average Pieces Borne Off;Average Hits Made;Average Opponent Hits;Highest Amount Hits\n")
     for i in range(len(dice_pairs)):
         file.write(f"{dice_pairs[i]};{average_winrates[i]:.2f};{highest_winrates[i]:.2f};{best_moves[i]};{average_borne_offs[i]:.2f};{average_hits[i]:.2f};{average_opponent_hits[i]:.2f};{highest_hits[i]}\n")
-    print(f"runtime of {heuristic.__name__}: {datetime.datetime.now() - start_time}")
+    print(f"runtime of furthest: {datetime.datetime.now() - start_time}")
+
+
+""" strats = [heuristics.move_furthest_first, heuristics.first_strat, heuristics.second_strat]
+for c_board in boards_list:
+    for strat_1 in strats:
+        for strat_2 in strats:
+            start_time = datetime.datetime.now()
+            dice_pairs, average_winrates, highest_winrates, best_moves, average_borne_offs, average_hits, average_opponent_hits, highest_hits = every_dice_simulation(num_simulations, c_board, strat_1, strat_2)
+            if c_board == None:
+                file = open(f"{folder}/init_{strat_1.__name__}_vs_{strat_2.__name__}.csv", "w")
+            else:
+                file = open(f"{folder}/running_{strat_1.__name__}_vs_{strat_2.__name__}.csv", "w")
+            file.write("Dice Pair;Average Win%;Highest Win%;Best Move;Average Pieces Borne Off;Average Hits Made;Average Opponent Hits;Highest Amount Hits\n")
+            for i in range(len(dice_pairs)):
+                file.write(f"{dice_pairs[i]};{average_winrates[i]:.2f};{highest_winrates[i]:.2f};{best_moves[i]};{average_borne_offs[i]:.2f};{average_hits[i]:.2f};{average_opponent_hits[i]:.2f};{highest_hits[i]}\n")
+            print(f"runtime of {strat.__name__}: {datetime.datetime.now() - start_time}") """
 
 print(f"total runtime of program: {datetime.datetime.now() - program_start_time}")

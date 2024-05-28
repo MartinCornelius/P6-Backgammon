@@ -137,22 +137,34 @@ def dan_heuristic(possible_moves, current_board):
 
 	return furthest_move
 
-#Check if there is any pieces that can hit each other on the board. ---Lucas tjek den her, jeg er meget usikker på den.
+#Check if there is any pieces that can hit each other on the board
 def pre_running_game_check(current_board):
-	if current_board.bar[0] != 0 or current_board.bar[1] != 0 or current_board.borne_off[0] != 0 or current_board.borne_off[1] != 0:
+	if current_board.bar[0] > 0 or current_board.bar[1] > 0:
 		return False
-	for tiles in current_board.points[0]:
-		for opp_tiles in current_board.points[1]:
-			if tiles > 0 & (current_board.points[1].index(opp_tiles) < current_board.points[0].index(tiles)) & opp_tiles > 0:
-				return False
-	return True
+	player1_counter = current_board.borne_off[0]
+	player2_counter = current_board.borne_off[1]
+	biggest = 0
+	smallest = 23
+	i = 0
+	while player1_counter < 15 and i < 24:
+		player1_counter += current_board.points[0][i]
+		i += 1
+	biggest = i - 1
+	i = 23
+	while player2_counter < 15 and i > -1:
+		player2_counter += current_board.points[1][i]
+		i -= 1
+	smallest = i + 1
+	if biggest < smallest:
+		return True
+	return False
 
 def home_game_check(current_board):
 	if current_board.bar[0] != 0 or current_board.bar[1] != 0:
 		return False
-	if current_board.current_player == 0 and sum(current_board.points[0][6:23]) > 0:
+	if current_board.current_player == 0 and (current_board.borne_off[0] + sum(current_board.points[0][0:6])) != 15:
 		return False
-	if current_board.current_player == 1 and sum(current_board.points[1][0:17]) > 0:
+	if current_board.current_player == 1 and (current_board.borne_off[1] + sum(current_board.points[1][18:24])) != 15:
 		return False
 	return True
 	
@@ -177,3 +189,10 @@ def first_strat(possible_moves, current_board):
 	
 	else:
 		return bear_off_first(possible_moves, current_board)
+
+def second_strat(possible_moves, current_board):
+	if home_game_check(current_board) == False:
+		return move_furthest_first(possible_moves, current_board)
+	else:
+		return bear_off_first(possible_moves, current_board)
+	
